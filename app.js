@@ -191,54 +191,63 @@
   /* ---------- pages ---------- */
   var pages = {};
   var SLIDES = [
-    { tone: 'terra', k: 'Nayi maa ke liye · delivery ke baad ke pehle 40 din', h: 'Delivery ho gayi. Nani door hain. <em>Ab khana kaun banayega?</em>', p: 'Baby ko sambhalte-sambhalte maa khud khaana bhool jaati hai. Himmaika nayi maa ke liye nani jaisa jaape ka khana bhejta hai — laddoo, panjiri, kheer, soup. Taaza, saaf, ek haath se khane laayak.', c: ['#/shop', 'Maa ke liye shop karo'], c2: ['#/quiz', 'Kya khaun? 2-min quiz'], arts: ['mother', 'laddoo', 'bowl'] },
-    { tone: 'sage', k: 'Humari kahani', h: 'Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em>', p: 'Pehle nani 40 din maa ki rasoi sambhalti thi. Aaj shehar mein na nani hai, na time. Isliye humne nani ki rasoi ko dabbe mein band kiya.', c: ['#/story', 'Humari kahani padho'], c2: ['#/samajh', 'Yeh khana kyun?'], arts: ['heart', 'mountain', 'pot'] },
-    { tone: 'ink', k: 'Pati, maa, behen — door se bhi', h: 'Aap wahan nahi ho sakte? <em>Aapka khana pahunch sakta hai.</em>', p: 'Bengaluru mein beti, Dehradun mein maa? Pehle 10 din ya poore 40 din ka dabba, aapki chitthi ke saath.', c: ['#/shop/combo', 'Bundles dekho'], c2: ['#/gift', 'Gift karo'], arts: ['gift', 'calendar', 'truck'] }
+    { tone: 'ink', hook: true, k: 'Nayi maa ke liye · delivery ke baad', h: 'Baby ko doodh pilaate-pilaate, <em>maa khud khaali ho jaati hai.</em>', p: 'Delivery mein khoon jaata hai. Har din doodh ke saath maa ke sharir se calcium jaata hai. Aur khane ka time? Bilkul nahi. Himmaika nayi maa ke liye bana khana hai — nani ki jaape ki rasoi, saaf ingredients se.', stats: [['~210 mg', 'calcium roz doodh ke saath maa ke sharir se', 'Kovacs review'], ['57%', 'Indian mahilayein anaemic', 'NFHS-5'], ['+530–600', 'kcal roz extra chahiye', 'ICMR-NIN']], c: ['#/shop', 'Maa ke liye shop karo'], swipe: true },
+    { tone: 'laddoo', n: '01 · Calcium', k: 'Jo doodh mein jaata hai', h: 'Har din <em>~210 mg calcium</em> doodh ke saath maa ke sharir se jaata hai.', p: 'Feeding maa ko roz 1,200 mg calcium chahiye. Mandua aur til — pahad ke do calcium-rich ingredients — ek laddoo mein.', src: 'ICMR-NIN 2020 · Kovacs review', prod: 'mandua', art: 'millet' },
+    { tone: 'meals', n: '02 · Iron', k: 'Jo delivery mein gaya', h: '<em>57%</em> Indian mahilaon mein pehle se khoon ki kami hai.', p: 'Upar se delivery mein khoon jaata hai. Isliye nani ki panjiri mein bhuna anaaj, nuts aur beej hote the — iron-containing ingredients.', src: 'NFHS-5, 2019–21', prod: 'panjiri', art: 'seeds' },
+    { tone: 'sips', n: '03 · Energy', k: 'Jo raaton mein jaata hai', h: 'Feeding maa ko roz <em>530–600 kcal extra</em> chahiye.', p: 'Ek aur insaan ka khana ban raha hai — aur raat ki neend bhi gayi. Gond laddoo: chhota, bharpoor, ek haath se.', src: 'ICMR-NIN 2020 · figure confirm hona baaki', prod: 'gond', art: 'sun' }
   ];
+  function slideHtml(s, i) {
+    var body;
+    if (s.hook) {
+      body = '<div class="slide-copy"><span class="kicker">' + s.k + '</span><h1>' + s.h + '</h1><p>' + s.p + '</p><div class="row"><a class="btn btn-p" href="' + s.c[0] + '">' + s.c[1] + '</a><button class="btn btn-ghost-w" data-slide="1">Swipe karke samjho →</button></div></div>' +
+        '<div class="hook-stats">' + s.stats.map(function (x) { return '<div class="hs"><strong>' + x[0] + '</strong><span>' + x[1] + '</span><small>' + x[2] + '</small></div>'; }).join('') + '</div>';
+    } else {
+      var p = byId(s.prod);
+      body = '<div class="slide-copy"><span class="kicker">' + s.n + ' · ' + s.k + '</span><h2 class="h1">' + s.h + '</h2><p>' + s.p + '</p><span class="src">' + s.src + '</span></div>' +
+        '<a class="slide-prod" href="#/p/' + p.id + '"><span class="sp-art tone-' + p.cat + '">' + art(p.art, 'big') + '</span><span class="sp-k">Himmaika ka jawab</span><strong>' + p.name + '</strong><small>' + p.short + '</small><span class="sp-foot"><b>' + rupee(p.price) + '</b><span class="btn btn-p btn-sm">Dekho →</span></span></a>';
+    }
+    return '<div class="slide tone-' + s.tone + (s.hook ? ' hook' : '') + (i ? '' : ' on') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' of ' + SLIDES.length + '"' + (i ? ' aria-hidden="true"' : '') + '><div class="wrap slide-in">' + body + '</div></div>';
+  }
   pages.home = function () {
-    return '<section class="hero2"><div class="slides">' + SLIDES.map(function (s, i) {
-      return '<div class="slide tone-' + s.tone + (i ? '' : ' on') + '" role="group" aria-label="Banner ' + (i + 1) + ' of 3"' + (i ? ' aria-hidden="true"' : '') + '><div class="wrap slide-in"><div class="slide-copy"><span class="kicker">' + s.k + '</span>' +
-        (i ? '<h2 class="h1">' + s.h + '</h2>' : '<h1>' + s.h + '</h1>') + '<p>' + s.p + '</p><div class="row"><a class="btn btn-p" href="' + s.c[0] + '">' + s.c[1] + '</a>' + (s.c2 ? '<a class="btn btn-g" href="' + s.c2[0] + '">' + s.c2[1] + '</a>' : '') + '</div></div>' +
-        '<div class="slide-art">' + art(s.arts[0], 'a1') + art(s.arts[1], 'a2') + art(s.arts[2], 'a3') + '<span class="photo-note">photo shoot ke baad asli tasveer</span></div></div></div>';
-    }).join('') + '</div><div class="dots2">' + SLIDES.map(function (_, i) { return '<button data-slide="' + i + '" aria-label="Banner ' + (i + 1) + '"' + (i ? '' : ' class="on"') + '></button>'; }).join('') + '</div></section>' +
+    return '<section class="hero2" aria-roledescription="carousel" aria-label="Nayi maa ka poshan"><div class="slides" id="slides">' + SLIDES.map(slideHtml).join('') + '</div>' +
+      '<button class="sl-arrow prev" data-slide="prev" aria-label="Pichhla">‹</button><button class="sl-arrow next" data-slide="next" aria-label="Agla">›</button>' +
+      '<div class="dots2">' + SLIDES.map(function (_, i) { return '<button data-slide="' + i + '" aria-label="Slide ' + (i + 1) + '"' + (i ? '' : ' class="on"') + '></button>'; }).join('') + '</div></section>' +
 
       '<div class="usp"><div class="wrap usp-in">' +
       [['shield', 'Certified organic ghee', 'pending'], ['flask', 'Har batch lab-tested', ''], ['seeds', 'No refined sugar', ''], ['hand', 'Ek haath se khane laayak', ''], ['leaf', 'Taaza, chhote batch', '']].map(function (u) { return '<div class="u">' + art(u[0]) + '<span>' + u[1] + (u[2] ? ' <span class="tag-pend">' + u[2] + '</span>' : '') + '</span></div>'; }).join('') + '</div></div>' +
 
-      '<section class="forwho"><div class="wrap"><div class="center"><span class="kicker">Yeh kiske liye hai</span><h2>Nayi maa ke liye. <em>Aur unke liye jo uski fikr karte hain.</em></h2></div><div class="fw">' +
-      [['mother', 'Nayi maa', 'Delivery haal hi mein hui hai ya hone waali hai. Baby ko sambhalna hai, khud ko bhi.', '#/shop', 'Apne liye shop karo'], ['heart', 'Pati aur parivaar', 'Madad karna chahte ho, par pata nahi kya banana hai. Dabba kholo, bas.', '#/shop/combo', 'Bundles dekho'], ['gift', 'Door baithi maa, behen, dost', 'Aap wahan nahi ja sakte. Aapka khana aur chitthi ja sakti hai.', '#/gift', 'Gift karo']].map(function (f) { return '<a class="fwc lift" href="' + f[3] + '">' + art(f[0], 'big') + '<h3>' + f[1] + '</h3><p>' + f[2] + '</p><span>' + f[4] + ' →</span></a>'; }).join('') + '</div></div></section>' +
+      '<section class="brand"><div class="wrap"><div class="center"><span class="kicker">Himmaika kya hai</span><h2>Postpartum maa ke liye <em>khana. Bas yahi banate hain.</em></h2>' +
+      '<p class="lede">Laddoo, panjiri, kheer, khichdi, soup aur garam ghoont — har cheez delivery ke baad ke dinon ke liye, nani ki jaape ki recipe se, saaf pahadi ingredients ke saath.</p></div>' +
+      '<div class="cats2">' + CATS.map(function (c) { var n = P.filter(function (p) { return p.cat === c.id; }).length; return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '">' + art(c.art, 'big') + '<strong>' + c.name + '</strong><small>' + c.line + '</small><span class="cnt">' + n + ' products →</span></a>'; }).join('') + '</div></div></section>' +
+
+      '<section class="story-band"><div class="wrap split"><div class="ab-art">' + art('mother', 'huge') + art('heart', 'a2') + '</div><div><span class="kicker">Humari kahani</span><h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
+      '<p class="lede">Pehle jaapa maike mein hota tha. Nani 40 din rasoi sambhalti thi — gond ke laddoo, panjiri, ajwain ka paani — aur maa ka kaam sirf baby ko dekhna aur khana tha.</p><p class="lede">Aaj shehar mein na nani hai, na rasoi mein koi, na research ka time. Isliye humne nani ki rasoi ko dabbe mein band kiya: हिम + मायका — <strong>Himmaika</strong>.</p>' +
+      '<a class="btn btn-g" href="#/story">Poori kahani</a></div></div></section>' +
+
+      '<section><div class="wrap">' + head("Nani's picks", 'Nayi maayein <em>sabse pehle yeh leti hain</em>', '#/shop', 'Sab dekho') + grid(P.filter(function (p) { return p.best; }), 4) + '</div></section>' +
 
       '<section class="problem"><div class="wrap"><div class="center"><span class="kicker">Asli mushkil</span><h2>Delivery ke baad ke din <em>koi nahi batata</em></h2><p class="lede">Sab badhaai dete hain, baby ki photo maangte hain. Par maa ke saath jo ho raha hai, uski baat koi nahi karta.</p></div>' +
-      '<div class="probs">' + [['moon', 'Raat ke 3 baje bhookh', 'Feeding ke baad pet khaali, aur rasoi mein koi nahi.'], ['sun', 'Thakaan jo jaati nahi', 'Delivery, khoon ki kami, aur raaton ki neend gayi.'], ['leaf', 'Pet saaf nahi hota', 'Dawaiyaan, iron ki goliyan, taankon ka darr — sabse aam, sabse chhupi takleef.'], ['chat', '"Kya khaun, kab khaun?"', 'Google par 50 jawab, bharosa kisi par nahi, research ka time bilkul nahi.'], ['mountain', 'Nani hazaar kilometre door', 'Pehle jaapa maike mein hota tha. Ab shehar mein, akele.']].map(function (x) { return '<div class="prob">' + art(x[0], 'big') + '<h3>' + x[1] + '</h3><p>' + x[2] + '</p></div>'; }).join('') + '</div>' +
-      '<div class="answer"><p><strong>Himmaika ka jawab:</strong> nani ki jaape ki rasoi — taaza, saaf ingredients se, har batch lab-tested, ek haath se khane laayak. Aap bas baby ko sambhalo.</p><a class="btn btn-p" href="#/shop">Dekho kya hai</a></div></div></section>' +
+      '<div class="probs">' + [['moon', 'Raat ke 3 baje bhookh', 'Feeding ke baad pet khaali, aur rasoi mein koi nahi.', 'makhana'], ['sun', 'Thakaan jo jaati nahi', 'Delivery, khoon ki kami, aur raaton ki neend gayi.', 'gond'], ['leaf', 'Pet saaf nahi hota', 'Dawaiyaan, iron ki goliyan, taankon ka darr — sabse aam, sabse chhupi takleef.', 'kheer'], ['chat', '"Kya khaun, kab khaun?"', 'Google par 50 jawab, bharosa kisi par nahi, research ka time bilkul nahi.', 'p10'], ['moon', 'Raat ko neend nahi', 'Baby so gaya, par aap nahi. Din bhar ka thakaa mann.', 'doodh']].map(function (x) { var p = byId(x[3]); return '<a class="prob" href="#/p/' + p.id + '">' + art(x[0], 'big') + '<h3>' + x[1] + '</h3><p>' + x[2] + '</p><span class="fix">' + p.name + ' →</span></a>'; }).join('') + '</div></div></section>' +
 
-      '<section><div class="wrap">' + head('Shop by category', 'Aaj kya chahiye?') +
-      '<div class="cats2">' + CATS.map(function (c) { return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '">' + art(c.art, 'big') + '<strong>' + c.name + '</strong><small>' + c.line + '</small></a>'; }).join('') + '</div></div></section>' +
-
-      '<section class="alt"><div class="wrap">' + head("Nani's picks", 'Sabse zyada <em>pasand kiye jaane waale</em>', '#/shop', 'Sab dekho') + grid(P.filter(function (p) { return p.best; }), 4) + '</div></section>' +
-
-      '<section><div class="wrap">' + head('Shop by need', 'Aapko abhi <em>kis cheez ki zaroorat hai?</em>', '', '', 'Har maa ka din alag hai. Apni zaroorat chuno.') +
+      '<section class="alt"><div class="wrap">' + head('Shop by need', 'Aapko abhi <em>kis cheez ki zaroorat hai?</em>', '', '', 'Har maa ka din alag hai. Apni zaroorat chuno.') +
       '<div class="needs" role="tablist">' + NEEDS.map(function (n, i) { return '<button role="tab" data-need="' + n.id + '" aria-selected="' + !i + '">' + art(n.art) + n.name + '</button>'; }).join('') + '</div>' +
       '<div id="needGrid">' + needGrid(NEEDS[0].id) + '</div></div></section>' +
 
-      '<section><div class="wrap"><div class="center"><span class="kicker">Andar kya hai</span><h2>Saaf. Taaza. <em>Pahadi.</em></h2><p class="lede">Hum label par wahi likhte hain jo dabbe mein hai. Pahad ke anaaj, asli nuts aur beej, dates ya gud ka meetha.</p></div>' +
-      '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet'], ['millet', 'Jhangora', 'High-fibre barnyard millet'], ['seeds', 'Gahat', 'Pahadi protein daal'], ['nut', 'Makhana', 'Halka, crunchy'], ['seeds', 'Til', 'Calcium aur iron waala beej'], ['drop', 'Gond', 'Jaape ki parampara']].map(function (x) { return '<div class="ing">' + art(x[0], 'big') + '<strong>' + x[1] + '</strong><small>' + x[2] + '</small></div>'; }).join('') + '</div>' +
-      '<p class="center note" style="margin-top:18px">' + art('pot', 'inline') + ' Aur jahan ghee chahiye, wahan organic Badri cow ghee — humare parivaar ki supply chain se.</p></div></section>' +
+      '<section><div class="wrap"><div class="center"><span class="kicker">Maa ki thali mein kya jaata hai</span><h2>Pahad ke anaaj, <em>jaape ki parampara</em></h2><p class="lede">Har ingredient jo hum postpartum maa ke khane mein daalte hain — aur kyun.</p></div>' +
+      '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet', 'mandua'], ['millet', 'Jhangora', 'High-fibre, pehle hafte ke liye', 'kheer'], ['seeds', 'Gahat', 'Pahadi protein daal', 'gahat'], ['nut', 'Makhana', 'Halka, raat ka snack', 'makhana'], ['seeds', 'Til', 'Calcium aur iron waala beej', 'mandua'], ['drop', 'Gond', 'Jaape ka sabse purana laddoo', 'gond']].map(function (x) { return '<a class="ing" href="#/p/' + x[3] + '">' + art(x[0], 'big') + '<strong>' + x[1] + '</strong><small>' + x[2] + '</small></a>'; }).join('') + '</div>' +
+      '<p class="center note" style="margin-top:18px">Meetha sirf dates ya gud se · Ghee: organic Badri cow ghee · Poori list har pack par</p></div></section>' +
 
-      '<section class="alt"><div class="wrap">' + head('Kyun Himmaika', 'Ghar pe banana, dukaan se lena, <em>ya Himmaika?</em>') + compareTable() + '</div></section>' +
-
-      '<section><div class="wrap"><div class="center"><span class="kicker">Subscribe & Save</span><h2>Laddoo khatam hone se <em>pehle naya dabba</em></h2></div>' +
+      '<section class="alt"><div class="wrap"><div class="center"><span class="kicker">Subscribe & Save</span><h2>Laddoo khatam hone se <em>pehle naya dabba</em></h2></div>' +
       '<div class="steps">' + [['laddoo', 'Product chuno', 'Laddoo, panjiri, sachets — jo roz chahiye.'], ['repeat', 'Har 2, 3 ya 4 hafte', 'Jitni jaldi khatam hota hai, utni baar.'], ['truck', SUB_OFF + '% bachao, har baar', 'Skip, roko ya cancel — ek WhatsApp se.']].map(function (s, i) { return '<div class="step"><span class="sn">' + (i + 1) + '</span>' + art(s[0], 'big') + '<h3>' + s[1] + '</h3><p>' + s[2] + '</p></div>'; }).join('') + '</div>' +
       '<div class="center" style="margin-top:22px"><a class="btn btn-p" href="#/p/gond">Subscribe karke dekho</a></div></div></section>' +
 
-      '<section class="planband"><div class="wrap split"><div><span class="kicker">Ek option yeh bhi</span><h2>Poore 40 din ka <em>dabba</em></h2><p>Agar aap sochna hi nahi chahte: teen phase, teen taaza shipments, din-ba-din card. Delivery se pehle book karo.</p><div class="row"><a class="btn btn-w" href="#/p/p40">40 Din Box · ' + rupee(4999) + '</a><a class="btn btn-ghost-w" href="#/plan">Plan samjho</a></div></div><div class="ab-art">' + art('calendar', 'huge') + '</div></div></section>' +
+      '<section class="planband"><div class="wrap split"><div><span class="kicker">Ek option yeh bhi</span><h2>Poore 40 din ka <em>dabba</em></h2><p>Agar aap sochna hi nahi chahte: teen phase, teen taaza shipments, din-ba-din card. Pati, maa ya behen bhi gift kar sakte hain.</p><div class="row"><a class="btn btn-w" href="#/p/p40">40 Din Box · ' + rupee(4999) + '</a><a class="btn btn-ghost-w" href="#/gift">Gift karo</a></div></div><div class="ab-art">' + art('calendar', 'huge') + '</div></div></section>' +
 
       '<section><div class="wrap narrow">' + naniNote('Beta, baby ke saath tum bhi nayi paida hui ho. Pehle 40 din apne aap ko utna hi pyaar do jitna use de rahi ho. Khana main bhej rahi hoon — tum bas samay pe kha lena.') + '</div></section>' +
 
       '<section class="alt"><div class="wrap">' + head('Our proof', 'Vaade nahi, <em>lab report</em>', '', '', 'Label padhne ka time kiske paas hai?') + proofBand + '</div></section>' +
 
-      '<section><div class="wrap center"><span class="kicker">Maaon ki baat</span><h2>Reviews launch ke baad</h2><p class="lede">Hum abhi launch nahi hue, isliye yahan koi review nahi hai. Nakli sitaare hum nahi lagate.</p>' +
-      '<div class="rev-ph">' + [1, 2, 3].map(function () { return '<div class="card">' + art('heart') + '<p class="note">Pehli asli maa ka review yahan aayega.</p></div>'; }).join('') + '</div></div></section>' +
+      '<section><div class="wrap center"><span class="kicker">Maaon ki baat</span><h2>Reviews launch ke baad</h2><p class="lede">Hum abhi launch nahi hue, isliye yahan koi review nahi hai. Nakli sitaare hum nahi lagate.</p></div></section>' +
 
       '<section class="news"><div class="wrap news-in"><div><h2>Nani ki chitthi, <em>har hafte</em></h2><p>Har hafte ek chhoti si baat — kya khaayein, kaise aaram karein. Spam nahi.</p></div>' +
       '<form id="newsForm" class="news-form"><label for="newsIn" class="sr">Email ya WhatsApp</label><input id="newsIn" type="text" placeholder="Email ya WhatsApp number" autocomplete="off"><button class="btn btn-p">Judo</button></form></div></section>';
@@ -297,7 +306,6 @@
       '<div class="ings">' + p.ing.map(function (g) { return '<div class="ing2' + (g[3] ? ' support' : '') + '">' + art(g[0], 'big') + '<div><strong>' + g[1] + '</strong>' + (g[3] ? ' <span class="chip">sahayak</span>' : '') + (g[2] ? '<p>' + g[2] + '</p>' : '') + '</div></div>'; }).join('') + '</div></div></section>' +
       '<section><div class="wrap split"><div><span class="kicker">Kab aur kaise</span><h2>Din mein <em>kahan fit hota hai</em></h2><div class="when">' + p.when.map(function (w) { return '<div class="w">' + art(w[0], 'big') + '<div><strong>' + w[1] + '</strong><p>' + w[2] + '</p></div></div>'; }).join('') + '</div><p class="note">' + p.how + '</p></div>' +
       '<div><span class="kicker">Kiske liye</span><h2>Yeh aapke liye hai <em>agar...</em></h2><ul class="tick big"><li>Aapki delivery haal hi mein hui hai, ya hone waali hai</li><li>Rasoi mein madad nahi, ya time nahi</li><li>Aap label padhe bina bharosa karna chahti hain</li><li>Aapko ghar jaisa, paramparik swaad chahiye</li></ul></div></div></section>' +
-      '<section class="alt"><div class="wrap">' + head('Tulna', 'Ghar, dukaan, <em>ya Himmaika?</em>') + compareTable() + '</div></section>' +
       '<section><div class="wrap">' + proofBand + '</div></section>' +
       '<section class="alt"><div class="wrap narrow">' + naniNote(p.note) + '</div></section>' +
       '<section><div class="wrap narrow"><h2>Poori jaankari</h2><div class="faq">' +
@@ -390,13 +398,13 @@
     document.querySelectorAll('.links a').forEach(function (a) { var on = a.dataset.r === key || (r === 'shop' && !parts[1] && a.dataset.r === 'shop'); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     $('#links').classList.remove('open'); $('#burger').setAttribute('aria-expanded', 'false');
     if (pages[r].after) pages[r].after(parts[1]);
-    clearInterval(slideTimer); if (r === 'home') slideTimer = setInterval(function () { slide(-1); }, 6000);
+    clearInterval(slideTimer); if (r === 'home') slideTimer = setInterval(function () { slide(-1); }, 8000);
     window.scrollTo(0, 0);
   }
   function slide(i) {
     var s = document.querySelectorAll('.slide'); if (!s.length) return;
     var cur = [].findIndex.call(s, function (x) { return x.classList.contains('on'); });
-    if (i < 0) i = (cur + 1) % s.length;
+    if (i === -1) i = (cur + 1) % s.length; else if (i === -2) i = (cur - 1 + s.length) % s.length;
     s.forEach(function (x, j) { x.classList.toggle('on', j === i); if (j === i) x.removeAttribute('aria-hidden'); else x.setAttribute('aria-hidden', 'true'); });
     document.querySelectorAll('.dots2 button').forEach(function (b, j) { b.classList.toggle('on', j === i); });
   }
@@ -417,7 +425,7 @@
     if (d.addp || d.buyp) { var id = d.addp || d.buyp; addItem(id, pdp.pack, pdp.sub, pdp.sub ? $('#every').value : 0); if (d.buyp) openCart(); return; }
     if (d.pack) { pdp.pack = +d.pack; document.querySelectorAll('#packs button').forEach(function (b) { b.setAttribute('aria-pressed', b === t); }); drawPrice(); return; }
     if (d.need) { document.querySelectorAll('[data-need]').forEach(function (b) { b.setAttribute('aria-selected', b === t); }); $('#needGrid').innerHTML = needGrid(d.need); return; }
-    if (d.slide) { slide(+d.slide); clearInterval(slideTimer); return; }
+    if (d.slide) { slide(d.slide === 'next' ? -1 : d.slide === 'prev' ? -2 : +d.slide); clearInterval(slideTimer); return; }
     if ('pin' in d) { var v = $('#pinIn').value.replace(/\D/g, ''); toast(v.length === 6 ? '📦 ' + v + ' — delivery ho jaayegi (prototype estimate: 3–5 din)' : '6 ank ka pincode daalo'); return; }
     if (d.inc) { cart[+d.inc].q++; drawCart(); return; }
     if (d.dec) { if (--cart[+d.dec].q <= 0) cart.splice(+d.dec, 1); drawCart(); return; }
@@ -444,6 +452,9 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCart(); $('#chat').hidden = true; } });
   window.addEventListener('scroll', function () { var s = $('#stickybuy'), b = $('#buyrow'); if (s && b) s.classList.toggle('show', b.getBoundingClientRect().bottom < 0); }, { passive: true });
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { if (e.target.closest('#slides')) tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) { if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 40) { slide(dx < 0 ? -1 : -2); clearInterval(slideTimer); } }, { passive: true });
   window.addEventListener('hashchange', route);
 
   $('#footHills').innerHTML = hills('transparent', '#E8D5BC', '#7D8450', '#3A2A1E');
