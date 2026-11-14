@@ -1,315 +1,450 @@
-/* Himmaika D2C storefront prototype — no backend. Cart and checkout are mocked. */
+/* Himmaika D2C storefront prototype — no backend. Cart, subscription, checkout and chat are mocked. */
 (function () {
   'use strict';
+  var art = window.HM_ART;
 
   /* ---------- catalogue ---------- */
   var CATS = [
-    { id: 'laddoo', name: 'Laddoo', e: '🟤', line: 'Roz ka ek, nani ke haath jaisa' },
-    { id: 'meals', name: 'Meals & Mixes', e: '🥣', line: 'Kheer, khichdi, soup, panjiri' },
-    { id: 'sips', name: 'Drinks & Snacks', e: '🫖', line: 'Garam ghoont aur ek haath ka snack' },
-    { id: 'combo', name: 'Combos', e: '📦', line: '10 din ya poore 40 din ka dabba' }
+    { id: 'laddoo', name: 'Laddoo', art: 'laddoo', line: 'Roz ka ek, nani ke haath jaisa' },
+    { id: 'meals', name: 'Meals & Mixes', art: 'bowl', line: 'Kheer, khichdi, soup, panjiri' },
+    { id: 'sips', name: 'Drinks & Snacks', art: 'cup', line: 'Garam ghoont aur ek haath ka snack' },
+    { id: 'combo', name: 'Bundles', art: 'gift', line: 'Week 1 se 40 din tak ke dabbe' }
   ];
+  var NEEDS = [
+    { id: 'taaqat', name: 'Taaqat aur energy', art: 'sun' },
+    { id: 'calcium', name: 'Calcium-rich', art: 'millet' },
+    { id: 'pet', name: 'Pet ke liye halka', art: 'leaf' },
+    { id: 'iron', name: 'Iron-rich ingredients', art: 'seeds' },
+    { id: 'raat', name: 'Raat ki rasam', art: 'moon' },
+    { id: 'snack', name: 'Ek haath ka snack', art: 'hand' }
+  ];
+  var GHEE = ['pot', 'Organic Badri cow ghee', 'Pahadi Badri gaay ka ghee — humare parivaar ki supply chain se. Swaad aur bharose ke liye.', true];
   var P = [
-    { id: 'gond', cat: 'laddoo', e: '🟤', tag: 'Best seller', name: 'Badri Ghee Gond Laddoo', price: 649, unit: '12 pcs · 300g', low: true, best: true,
+    { id: 'gond', cat: 'laddoo', art: 'laddoo', badge: "Nani's Pick", name: 'Gond Laddoo', price: 649, unit: '12 pcs · 300g', low: true, best: true, needs: ['taaqat', 'snack'],
+      short: 'Ek laddoo, poori subah ki taaqat — jab khana banane ka time hi na mile.',
       moment: 'Subah se kuch nahi khaya, aur baby abhi-abhi soya hai.',
-      line: 'Gond, nuts aur Badri ghee — wahi taaqat waala laddoo jo nani zabardasti khilati thi.',
-      sci: 'Energy-dense khana, un extra calories ke liye jo feeding maa ko roz chahiye.',
-      ing: 'Gond (edible gum), gehun ka atta, Badri cow ghee, badam, kaju, khajoor (dates), sonth, elaichi.',
-      how: 'Roz 1 laddoo, garam doodh ya ajwain paani ke saath. C-section ke baad kab shuru karein, doctor se poochh lein.' },
-    { id: 'mandua', cat: 'laddoo', e: '🌾', tag: 'Calcium waali parampara', name: 'Mandua–Til Laddoo', price: 499, unit: '12 pcs', low: true, best: true,
+      ben: [['sun', 'Chhota laddoo, bharpoor energy', 'Feeding maa ko roz ~530–600 kcal extra chahiye. Do bite mein kaafi kuch.'], ['nut', 'Nuts waala protein', 'Badam aur kaju — marammat ke dinon ka saamaan.'], ['hand', 'Ek haath se', 'Na chammach, na plate. Baby god mein ho tab bhi.'], ['heart', 'Peedhiyon ki recipe', 'Jaape mein gond ka laddoo — har ghar ki parampara.']],
+      ing: [['drop', 'Gond (edible gum)', 'Jaape ka sabse paramparik ingredient, ghee mein phula kar.'], ['nut', 'Badam aur kaju', 'Protein aur achhi chiknai.'], ['seeds', 'Khajoor (dates)', 'Meetha sirf dates se — refined sugar nahi.'], ['spoon', 'Sonth aur elaichi', 'Garam taaseer, nani ke hisaab se.'], GHEE],
+      list: 'Gond, gehun ka atta, organic Badri cow ghee, badam, kaju, khajoor (dates), sonth, elaichi.',
+      when: [['sun', 'Subah', 'Garam doodh ke saath 1 laddoo'], ['clock', 'Feeding ke beech', 'Jab achanak bhookh lage']],
+      how: 'Roz 1 laddoo. C-section ke baad bhaari cheezein kab shuru karein, doctor se poochh lein (zyadatar din 12 ke baad).',
+      note: 'Gond laddoo mein kanjoosi nahi chalti — na ghee mein, na pyaar mein. Roz ek, subah-subah. Baaki main dekh loongi.' },
+    { id: 'mandua', cat: 'laddoo', art: 'millet', badge: 'Calcium-rich', name: 'Mandua–Til Laddoo', price: 499, unit: '12 pcs', low: true, best: true, needs: ['calcium', 'snack'],
+      short: 'Finger millet aur til — feeding ke dinon ke calcium hisaab ka meetha saathi.',
       moment: 'Kamar mein dard hai, aur doodh ka glass roz thanda ho jaata hai.',
-      line: 'Finger millet aur til — calcium ke liye pahad ki purani jodi.',
-      sci: 'Calcium-rich ingredients, uske 1,200 mg/din ke hisaab ki taraf.',
-      ing: 'Mandua (finger millet) atta, safed til, Badri cow ghee, khajoor (dates), gud, elaichi.',
-      how: 'Din mein 1–2 laddoo, jab bhi haath khaali ho.' },
-    { id: 'methi', cat: 'laddoo', e: '🟠', tag: 'Kadwahat ke bina', name: 'Mild Methi–Date Laddoo', price: 549, unit: '12 pcs', low: true,
+      ben: [['millet', 'Calcium-rich mandua', 'Feeding maa ki zaroorat 1,200 mg calcium/din (ICMR-NIN). Mandua anaajon mein calcium ke liye jaana jaata hai.'], ['seeds', 'Til ki taaqat', 'Safed til — calcium aur iron waala purana beej.'], ['leaf', 'Fibre waala anaaj', 'Millet ka laddoo, maida nahi.'], ['hand', 'Ek haath se', 'Doodh ka glass thanda ho jaaye, laddoo nahi.']],
+      ing: [['millet', 'Mandua (finger millet)', 'Pahad ka calcium-rich anaaj, Garhwal-Kumaon se.'], ['seeds', 'Safed til', 'Calcium aur iron waale beej.'], ['seeds', 'Khajoor aur gud', 'Meetha bina refined sugar.'], ['spoon', 'Elaichi', 'Bas khushboo ke liye.'], GHEE],
+      list: 'Mandua (finger millet) atta, safed til, organic Badri cow ghee, khajoor (dates), gud, elaichi.',
+      when: [['clock', 'Din mein kabhi bhi', '1–2 laddoo, jab haath khaali ho'], ['moon', 'Raat ki feeding', 'Bistar ke paas ka dabba']],
+      how: 'Din mein 1–2 laddoo.',
+      note: 'Hamare pahad mein mandua ki roti khaakar hi aurtein kheton mein jaati thi. Ab tum laddoo kha lo — wahi taaqat, kam mehnat.' },
+    { id: 'methi', cat: 'laddoo', art: 'laddoo', badge: 'Kadwahat ke bina', name: 'Mild Methi–Date Laddoo', price: 549, unit: '12 pcs', low: true, needs: ['taaqat'],
+      short: 'Methi ki parampara, bina kadwahat ke — dates se halka meetha.',
       moment: 'Mummy kehti hain methi ka laddoo zaroori hai. Aapko uski kadwahat yaad hai.',
-      line: 'Methi ki parampara, kadwahat ke bina — dates se meetha.',
-      sci: 'Peedhiyon se nayi maa ko diya jaane waala laddoo. Hum is se koi doodh waala vaada nahi karte.',
-      ing: 'Gehun ka atta, methi dana (halka bhuna), Badri cow ghee, khajoor (dates), badam, saunf.',
-      how: 'Roz 1 laddoo. Methi kuch logon ko suit nahi karti — pehle aadha kha kar dekhein.' },
-    { id: 'panjiri', cat: 'meals', e: '🥣', tag: 'Purani parampara', name: 'Pahadi Panjiri', price: 549, unit: '400g jar', low: true, best: true,
+      ben: [['heart', 'Parampara, naye swaad mein', 'Jaape ka methi laddoo — itna halka ki roz kha sako.'], ['seeds', 'Dates se meetha', 'Refined sugar nahi.'], ['nut', 'Badam ke saath', 'Thoda protein, thodi chiknai.'], ['hand', 'Ek haath se', 'Chhota size, aasaan bite.']],
+      ing: [['seeds', 'Methi dana (halka bhuna)', 'Bhun kar kadwahat kam ki gayi.'], ['seeds', 'Khajoor (dates)', 'Sirf yahi meetha.'], ['nut', 'Badam', 'Crunch aur protein.'], ['leaf', 'Saunf', 'Taazgi ke liye.'], GHEE],
+      list: 'Gehun ka atta, methi dana (bhuna), organic Badri cow ghee, khajoor (dates), badam, saunf.',
+      when: [['sun', 'Subah', '1 laddoo, garam paani ke saath']],
+      how: 'Roz 1 laddoo. Methi kuch logon ko suit nahi karti — pehle aadha kha kar dekhein. Hum is laddoo se doodh ka koi vaada nahi karte.',
+      note: 'Methi ka naam sunte hi muh bana leti thi na? Isme kadwahat maine nikaal di hai. Ab koi bahana nahi.' },
+    { id: 'panjiri', cat: 'meals', art: 'jar', badge: 'Iron-rich ingredients', name: 'Pahadi Panjiri', price: 549, unit: '400g jar', low: true, best: true, needs: ['iron', 'taaqat', 'snack'],
+      short: 'Bhuna anaaj, makhana aur nuts — raat 3 baje ki bhookh ka chammach-bhar jawab.',
       moment: 'Raat ke 3 baje feeding ke baad pet mein choohe daud rahe hain.',
-      line: 'Bhuna anaaj, makhana, nuts, Badri ghee — chammach bhar ke, ek haath se.',
-      sci: 'Iron-containing ingredients — kyunki 57% Indian mahilaon mein khoon ki kami hai (NFHS-5).',
-      ing: 'Gehun ka atta, mandua atta, makhana, badam, kaju, magaz, Badri cow ghee, gud, sonth.',
-      how: '2 bade chammach, seedha jar se ya garam doodh mein ghol kar.' },
-    { id: 'kheer', cat: 'meals', e: '🍚', tag: 'Week 1 · C-section friendly', name: 'Jhangora Kheer Mix', price: 299, unit: '4 servings', low: true, best: true,
+      ben: [['seeds', 'Iron-containing ingredients', '57% Indian mahilaon mein khoon ki kami hai (NFHS-5). Nani ki panjiri isi liye thi.'], ['millet', 'Bhuna anaaj', 'Gehun aur mandua, dheemi aanch par.'], ['nut', 'Makhana aur magaz', 'Halka, crunchy, bharpoor.'], ['spoon', 'Do tarah se', 'Seedha jar se, ya garam doodh mein.']],
+      ing: [['millet', 'Gehun aur mandua atta', 'Dheere-dheere bhuna hua.'], ['nut', 'Makhana, badam, kaju, magaz', 'Nuts aur beej ka mel.'], ['seeds', 'Gud', 'Paramparik meetha, refined sugar nahi.'], ['spoon', 'Sonth', 'Garam taaseer.'], GHEE],
+      list: 'Gehun ka atta, mandua atta, makhana, badam, kaju, magaz, organic Badri cow ghee, gud, sonth.',
+      when: [['moon', 'Raat ki feeding ke baad', '2 bade chammach, seedha jar se'], ['sun', 'Subah', 'Garam doodh mein ghol kar']],
+      how: '2 bade chammach, seedha jar se ya garam doodh mein ghol kar.',
+      note: 'Panjiri ke bina jaapa kaisa? Jar bistar ke paas rakho. Raat ko jab bhookh lage, kisi ko uthaane ki zaroorat nahi.' },
+    { id: 'kheer', cat: 'meals', art: 'bowl', badge: 'Week 1 · C-section friendly', name: 'Jhangora Kheer Mix', price: 299, unit: '4 servings', low: true, best: true, needs: ['pet'],
+      short: 'Pehle hafte ka naram, garam khana — halka, pachne mein aasaan, fibre waala.',
       moment: 'Pehla hafta hai. Kuch bhaari khane ka mann nahi, aur pet bhi saaf nahi ho raha.',
-      line: 'Pehle hafte ka naram khana — halka, garam, easy-digest.',
-      sci: 'High-fibre barnyard millet — us kabz ke liye jiski baat koi nahi karta.',
-      ing: 'Jhangora (barnyard millet), khajoor powder, makhana, elaichi, kesar.',
-      how: 'Ek sachet + 1 cup doodh ya paani, 10 minute dheemi aanch par.' },
-    { id: 'khichdi', cat: 'meals', e: '🥘', tag: '15 minute', name: 'Moong–Jhangora Khichdi Kit', price: 399, unit: '4 meals',
+      ben: [['leaf', 'High-fibre jhangora', 'Delivery ke baad kabz aam hai. Fibre waala anaaj nani ka purana tareeka hai.'], ['bowl', 'Naram aur garam', 'Pehle 10 din ke liye — C-section ho ya normal.'], ['clock', '10 minute', 'Ek sachet, ek cup doodh, bas.'], ['seeds', 'Dates se meetha', 'Refined sugar nahi.']],
+      ing: [['millet', 'Jhangora (barnyard millet)', 'Pahad ka high-fibre, halka anaaj.'], ['seeds', 'Khajoor powder', 'Halka meetha.'], ['nut', 'Makhana', 'Naram crunch.'], ['spoon', 'Elaichi, kesar', 'Khushboo.']],
+      list: 'Jhangora (barnyard millet), khajoor powder, makhana, elaichi, kesar.',
+      when: [['sun', 'Dopahar', 'Halka lunch'], ['moon', 'Raat', 'Garam kheer, sone se pehle']],
+      how: 'Ek sachet + 1 cup doodh ya paani, 10 minute dheemi aanch par.',
+      note: 'Pehle das din pet ko aaram do. Jhangore ki kheer khaao, garam paani piyo. Bhaari cheezein baad mein.' },
+    { id: 'khichdi', cat: 'meals', art: 'bowl', badge: '15-minute meal', name: 'Moong–Jhangora Khichdi Kit', price: 399, unit: '4 meals', needs: ['pet', 'taaqat'],
+      short: '15 minute mein poora, garam khana — un dinon ke liye jab khade hone ki himmat na ho.',
       moment: 'Dopahar ke 3 baj gaye. Aapne abhi tak khana nahi khaya.',
-      line: '15 minute mein poora khana, Badri ghee sachet ke saath.',
-      sci: 'Ek asli meal, un dinon ke liye jab khade hone ki bhi himmat nahi.',
-      ing: 'Moong dal, jhangora, jeera, haldi, hing, pahadi namak; alag se Badri cow ghee sachet.',
-      how: 'Cooker mein kit + 3 cup paani, 2 seeti. Upar se ghee sachet.' },
-    { id: 'gahat', cat: 'meals', e: '🍲', tag: 'Sirf Himmaika', name: 'Gahat Soup Mix', price: 349, unit: '6 servings',
+      ben: [['clock', '15 minute, 2 seeti', 'Pati bhi bana le.'], ['leaf', 'Pet ke liye halka', 'Moong aur millet — paramparik halka khana.'], ['nut', 'Daal waala protein', 'Moong dal se.'], ['pot', 'Ghee sachet saath', 'Upar se ek chammach.']],
+      ing: [['seeds', 'Moong dal', 'Halki, pachne mein aasaan daal.'], ['millet', 'Jhangora', 'Chawal ki jagah fibre waala millet.'], ['spoon', 'Jeera, haldi, hing', 'Ghar jaisa tadka.'], ['mountain', 'Pahadi namak', 'Pahad ka swaad.'], GHEE],
+      list: 'Moong dal, jhangora, jeera, haldi, hing, pahadi namak; alag se organic Badri cow ghee sachet.',
+      when: [['sun', 'Lunch ya dinner', 'Ek poora meal']],
+      how: 'Cooker mein kit + 3 cup paani, 2 seeti. Upar se ghee sachet.',
+      note: 'Khana chhodna nahi hai, bas. Khichdi ka packet rakha hai — damaad ji se bolo, do seeti laga dein.' },
+    { id: 'gahat', cat: 'meals', art: 'cup', badge: 'Sirf Himmaika', name: 'Gahat Soup Mix', price: 349, unit: '6 servings', needs: ['taaqat', 'pet'],
+      short: 'Pahadi horse gram ka garam namkeen soup — meethe se break, protein waali raahat.',
       moment: 'Meetha kha-kha ke mann bhar gaya hai. Kuch namkeen, kuch garam chahiye.',
-      line: 'Pahadi horse gram ka garam namkeen soup — meethe se break, protein waali raahat.',
-      sci: 'Protein-containing daal — sharir ki marammat ke dinon ka khana.',
-      ing: 'Gahat (horse gram) powder, jeera, lehsun, kali mirch, pahadi namak, jakhiya.',
-      how: '2 chammach mix + 1 cup garam paani, 5 minute ubaal lo. Mug mein piyo.' },
-    { id: 'paani', cat: 'sips', e: '🫖', tag: 'Roz ki aadat', name: 'Ajwain–Saunf–Jeera Water Sachets', price: 249, unit: '30 sachets',
+      ben: [['nut', 'Protein waali daal', 'Gahat — pahad ki sardiyon ki daal.'], ['cup', 'Mug mein, 5 minute', 'Chammach ki zaroorat nahi.'], ['leaf', 'Namkeen break', 'Har cheez meethi nahi honi chahiye.'], ['mountain', 'Sirf pahad mein milta', 'Shehar mein gahat dhoondhna mushkil hai.']],
+      ing: [['seeds', 'Gahat (horse gram)', 'Uttarakhand ki paramparik daal.'], ['spoon', 'Jeera, lehsun, kali mirch', 'Garam masala.'], ['leaf', 'Jakhiya', 'Pahadi tadke ka beej.'], ['mountain', 'Pahadi namak', 'Pisyun loon.']],
+      list: 'Gahat (horse gram) powder, jeera, lehsun, kali mirch, pahadi namak, jakhiya.',
+      when: [['clock', 'Shaam', '1 mug, garam-garam']],
+      how: '2 chammach mix + 1 cup garam paani, 5 minute ubaal lo.',
+      note: 'Gahat ki daal hamare yahan sardiyon mein banti hai. Garam-garam piyo, haath mein mug pakad ke.' },
+    { id: 'paani', cat: 'sips', art: 'sachet', badge: 'Roz ki aadat', name: 'Ajwain–Saunf–Jeera Water', price: 249, unit: '30 sachets', needs: ['pet'],
+      short: 'Nani waala garam paani, sachet mein — thermos bharo, din bhar ghoont lo.',
       moment: 'Feeding ke waqt gala sookhta hai, aur paani ka glass hamesha doosre kamre mein hota hai.',
-      line: 'Nani waala garam paani, sachet mein. Thermos bharo, din bhar ghoont lo.',
-      sci: 'Feeding ke dinon mein paani peete rehne ki aasaan aadat.',
-      ing: 'Ajwain, saunf, jeera — bas.',
-      how: '1 sachet, 1 litre ubalta paani, thermos mein. Din bhar ghoont-ghoont.' },
-    { id: 'doodh', cat: 'sips', e: '🥛', tag: 'Raat ke liye', name: 'Haldi–Saunth Doodh Mix', price: 399, unit: '200g', low: true,
+      ben: [['drop', 'Paani peene ki aadat', 'Feeding ke dinon mein pyaas zyada lagti hai.'], ['leaf', 'Teen beej, bas', 'Ajwain, saunf, jeera — kuch aur nahi.'], ['clock', '1 sachet = 1 litre', 'Subah ek baar, din bhar ka.'], ['heart', 'Nani ka niyam', '"Thanda paani nahi, ajwain ka paani."']],
+      ing: [['seeds', 'Ajwain', 'Jaape ka sabse purana saathi.'], ['leaf', 'Saunf', 'Halki meethi khushboo.'], ['seeds', 'Jeera', 'Rasoi ka roz ka beej.']],
+      list: 'Ajwain, saunf, jeera — bas.',
+      when: [['sun', 'Subah', '1 sachet, thermos mein'], ['clock', 'Din bhar', 'Ghoont-ghoont']],
+      how: '1 sachet, 1 litre ubalta paani, thermos mein. Din bhar ghoont-ghoont.',
+      note: 'Paani kam piyogi toh main naraaz ho jaungi. Thermos bhar ke paas rakho.' },
+    { id: 'doodh', cat: 'sips', art: 'cup', badge: 'Raat ke liye', name: 'Haldi–Saunth Doodh Mix', price: 399, unit: '200g', low: true, needs: ['raat'],
+      short: 'Raat ka garam doodh — haldi, sonth, makhana aur nuts, din khatam karne ki rasam.',
       moment: 'Raat ke 11 baje. Baby so gaya, par aapki neend nahi aa rahi.',
-      line: 'Raat ka doodh: haldi, sonth, makhana, nuts.',
-      sci: 'Hormones ke utaar-chadhaav waale hafton mein ek garam, shaant rasam.',
-      ing: 'Haldi, sonth, makhana powder, badam, khajoor powder, kali mirch, elaichi.',
-      how: '1 chammach, 1 cup garam doodh mein. Sone se pehle.' },
-    { id: 'makhana', cat: 'sips', e: '🍿', tag: 'Ek haath ka snack', name: 'Pahadi Namak Makhana', price: 299, unit: '100g',
+      ben: [['moon', 'Raat ki rasam', 'Hormones ke utaar-chadhaav waale hafton mein ek garam, shaant aadat.'], ['spoon', 'Haldi aur sonth', 'Paramparik garam masale.'], ['nut', 'Makhana aur badam', 'Thoda bharpoor.'], ['clock', '1 chammach, 1 minute', 'Doodh garam karo, ghol do.']],
+      ing: [['spoon', 'Haldi', 'Rasoi ki sabse jaani-pehchaani jadi.'], ['spoon', 'Sonth', 'Sookhi adrak.'], ['nut', 'Makhana, badam', 'Powder mein.'], ['seeds', 'Khajoor powder', 'Halka meetha.']],
+      list: 'Haldi, sonth, makhana powder, badam, khajoor powder, kali mirch, elaichi.',
+      when: [['moon', 'Sone se pehle', '1 cup garam doodh']],
+      how: '1 chammach, 1 cup garam doodh mein. Sone se pehle.',
+      note: 'Din kaisa bhi gaya ho, raat ko ek cup garam doodh. Phone rakh do, baby ko dekho, aur so jao.' },
+    { id: 'makhana', cat: 'sips', art: 'jar', badge: 'Ek haath ka snack', name: 'Pahadi Namak Makhana', price: 299, unit: '100g', needs: ['snack'],
+      short: 'Ghee-roasted makhana, pahadi namak ke saath — baby pakde-pakde, ek haath se.',
       moment: 'Baby god mein so gaya hai. Hilna mana hai, aur bhookh lagi hai.',
-      line: 'Ghee-roasted makhana, pahadi namak ke saath — ek haath se, baby pakde-pakde.',
-      sci: 'Raat ke 3 baje ki bhookh ke liye, bina rasoi jaaye.',
-      ing: 'Makhana, Badri cow ghee, pahadi pisyun loon (masaaledaar namak).',
-      how: 'Jar bistar ke paas rakho. Bas.' },
-    { id: 'p10', cat: 'combo', e: '📦', tag: 'Combo', name: 'Pehle 10 Din Box', price: 1499, unit: 'Week 1 ka poora khana',
+      ben: [['hand', 'Ek haath se', 'Jar khola, muthhi bhari.'], ['leaf', 'Halka snack', 'Bhuna, tala nahi.'], ['mountain', 'Pahadi namak', 'Pisyun loon ka swaad.'], ['moon', '3 baje ki bhookh', 'Bina rasoi jaaye.']],
+      ing: [['nut', 'Makhana', 'Halka, crunchy.'], ['mountain', 'Pahadi pisyun loon', 'Sil-batte pe pisa masaaledaar namak.'], GHEE],
+      list: 'Makhana, organic Badri cow ghee, pahadi pisyun loon.',
+      when: [['clock', 'Kabhi bhi', 'Bistar ke paas ka jar']],
+      how: 'Jar bistar ke paas rakho. Bas.',
+      note: 'Chips nahi, makhana. Ek muthhi abhi, ek baad mein.' },
+    { id: 'p10', cat: 'combo', art: 'gift', badge: 'Bundle · Week 1', name: 'Pehle 10 Din Box', price: 1499, mrp: 1596, unit: '4 products + guide card', needs: ['pet'],
+      short: 'Hospital se ghar aate hi — pehle 10 din ka naram, garam khana ek dabbe mein.',
       moment: 'Hospital se ghar aaye ho, aur rasoi mein kya banega kisi ko nahi pata.',
       line: 'Sabse naazuk din, sabse naram khana — ek hi dabbe mein.',
-      sci: 'Pehle 10 din halka aur garam: sharir abhi sambhal raha hai.',
-      ing: 'Jhangora Kheer Mix, Moong–Jhangora Khichdi Kit, Ajwain–Saunf–Jeera Sachets, Haldi–Saunth Doodh Mix, din-ba-din guide card.',
-      how: 'Dabbe ke andar ke card par likha hai kis din kya khana hai.' },
-    { id: 'p40', cat: 'combo', e: '🎁', tag: 'Combo · poora jaapa', name: 'Poore 40 Din Box', price: 4999, unit: 'Saare 10 products + ghee',
+      ben: [['bowl', 'Pehle 10 din ka menu', 'Kheer, khichdi, garam paani, raat ka doodh.'], ['calendar', 'Din-ba-din card', 'Sochna nahi padega.'], ['leaf', 'Pet ke liye halka', 'C-section ho ya normal.'], ['chat', 'WhatsApp Nani', 'Khane ke sawaalon ke liye.']],
+      ing: [['bowl', 'Jhangora Kheer Mix', ''], ['bowl', 'Moong–Jhangora Khichdi Kit', ''], ['sachet', 'Ajwain–Saunf–Jeera Water', ''], ['cup', 'Haldi–Saunth Doodh Mix', '']],
+      list: 'Jhangora Kheer Mix, Moong–Jhangora Khichdi Kit, Ajwain–Saunf–Jeera Water (30), Haldi–Saunth Doodh Mix, din-ba-din guide card.',
+      when: [['calendar', 'Din 1–10', 'Card par likha hai kis din kya']],
+      how: 'Dabbe ke andar ke card par likha hai kis din kya khana hai.',
+      note: 'Pehle das din sirf do kaam: baby ko dekhna aur khana. Baaki is dabbe pe chhod do.' },
+    { id: 'p40', cat: 'combo', art: 'calendar', badge: 'Bundle · 40 din', name: 'Poore 40 Din Box', price: 4999, mrp: 5594, unit: 'Saare 10 products + ghee jar', needs: ['taaqat'],
+      short: 'Jaise nani 40 din rasoi sambhalti thi — saare 10 products, teen taaza shipments mein.',
       moment: 'Nani aa nahi sakti. Par unki poori rasoi aa sakti hai.',
       line: 'Jaise nani 40 din rasoi sambhalti thi — saare 10 products, teen taaza shipments mein.',
-      sci: 'Pehle halka, phir taaqat, phir nayi routine — teen phase, sahi waqt par.',
-      ing: 'Saare 10 products, 250ml Badri cow ghee jar, din-ba-din guide. Shipment din 1, 11 aur 26 ke aas-paas.',
-      how: 'Due date bata do; pehla dabba delivery ke aas-paas niklega.' },
-    { id: 'pn', cat: 'combo', e: '💛', tag: 'Combo · expert ke saath', name: 'Nani+ Box', price: 8999, unit: '40 Din Box + 3 expert calls',
+      ben: [['calendar', 'Teen phase', 'Pehle halka, phir taaqat, phir nayi routine.'], ['truck', 'Teen taaza shipments', 'Din 1, 11 aur 26 ke aas-paas.'], ['pot', '250ml ghee jar', 'Roti, khichdi, sab ke liye.'], ['chat', 'WhatsApp Nani', 'Poore 40 din saath.']],
+      ing: [['bowl', 'Din 1–10: Halka aur garam', 'Kheer, khichdi, garam paani, doodh mix'], ['laddoo', 'Din 11–25: Taaqat', 'Gond laddoo, panjiri, gahat soup, mandua-til'], ['jar', 'Din 26–40: Nayi routine', 'Methi-date laddoo, makhana, refills']],
+      list: 'Saare 10 products, 250ml organic Badri cow ghee jar, din-ba-din guide. Shipment din 1, 11 aur 26 ke aas-paas.',
+      when: [['calendar', '7th month mein book karo', 'Shipping baby aane pe shuru']],
+      how: 'Due date bata do; pehla dabba delivery ke aas-paas niklega.',
+      note: 'Main wahan nahi aa sakti, par meri rasoi aa sakti hai. 40 din, teen dabbe, ek bhi din bhookhi mat rehna.' },
+    { id: 'pn', cat: 'combo', art: 'heart', badge: 'Bundle · expert ke saath', name: 'Nani+ Box', price: 8999, unit: '40 Din Box + 3 expert calls', needs: [],
+      short: 'Poora 40 din ka dabba, saath mein dietitian aur lactation consultant ki calls.',
       moment: 'Aap chahte ho koi poori zimmedari le le.',
       line: 'Poora 40 din ka dabba, saath mein dietitian aur lactation consultant ki calls.',
-      sci: 'Khana humara, salah expert ki — aapki haalat ke hisaab se.',
-      ing: 'Poore 40 Din Box, 2 dietitian calls, 1 lactation-consultant call, Jain / kam-meetha customisation.',
-      how: 'Order ke baad WhatsApp par call ka time tay hoga.' }
+      ben: [['calendar', 'Poora 40 Din Box', 'Saare products, teen shipments.'], ['chat', '2 dietitian calls', 'Aapki thali, aapki bhasha mein.'], ['heart', '1 lactation call', 'Feeding ke sawaalon ke liye expert.'], ['leaf', 'Jain / kam meetha', 'Aapke hisaab se badlaav.']],
+      ing: [['calendar', 'Poore 40 Din Box', ''], ['chat', '2 dietitian calls', ''], ['heart', '1 lactation-consultant call', ''], ['leaf', 'Jain / kam-meetha customisation', '']],
+      list: 'Poore 40 Din Box, 2 dietitian calls, 1 lactation-consultant call, Jain / kam-meetha customisation, priority support.',
+      when: [['calendar', 'Order ke baad', 'WhatsApp par call ka time tay hoga']],
+      how: 'Order ke baad WhatsApp par call ka time tay hoga.',
+      note: 'Khana main bhejungi, salah doctor-didi dengi. Tum bas aaram karo.' }
   ];
-  var cart = {}, gift = false;
+  P.forEach(function (p) { if (!p.line) p.line = p.short; p.e = ''; });
   var byId = function (id) { return P.filter(function (p) { return p.id === id; })[0]; };
+  var PACKS = [{ n: 1, off: 0, l: '1 pack' }, { n: 2, off: 8, l: '2 packs' }, { n: 3, off: 12, l: '3 packs', tag: 'Best value' }];
+  var SUB_OFF = 10, FREE_SHIP = 999;
+  var cart = [], gift = false;
 
   /* ---------- helpers ---------- */
   var $ = function (s, r) { return (r || document).querySelector(s); };
-  var rupee = function (n) { return '₹' + n.toLocaleString('en-IN'); };
+  var rupee = function (n) { return '₹' + Math.round(n).toLocaleString('en-IN'); };
   function hills(top, a, b, c) {
-    return '<svg viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">' +
-      '<rect width="1440" height="150" fill="' + top + '"/>' +
+    return '<svg viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><rect width="1440" height="150" fill="' + top + '"/>' +
       '<path d="M0 150 L0 96 L120 52 L210 88 L330 30 L420 70 L470 48 L600 100 L720 42 L800 76 L900 22 L1010 82 L1110 50 L1230 96 L1330 58 L1440 92 L1440 150Z" fill="' + a + '"/>' +
-      '<path d="M900 22 L925 46 L905 42 L893 54 L880 38Z M330 30 L352 52 L334 48 L322 58 L310 44Z M720 42 L738 60 L722 57 L712 66 L702 54Z" fill="#fff" opacity=".85"/>' +
       '<path d="M0 150 L0 118 Q180 78 360 112 T720 108 T1080 114 T1440 104 L1440 150Z" fill="' + b + '"/>' +
       '<path d="M0 150 L0 136 Q240 108 480 132 T960 130 T1440 128 L1440 150Z" fill="' + c + '"/></svg>';
   }
   function toast(msg) {
-    var t = document.createElement('div');
-    t.className = 'toast'; t.textContent = msg;
-    var box = $('#toasts');
-    while (box.children.length >= 2) box.firstChild.remove();
-    box.appendChild(t);
+    var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    var box = $('#toasts'); while (box.children.length >= 2) box.firstChild.remove(); box.appendChild(t);
     setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 320); }, 3200);
   }
-  function src(label, check) {
-    return '<span class="src' + (check ? ' chk' : '') + '">' + label + (check ? ' · figure confirm hona baaki' : '') + '</span>';
-  }
-  function chips(p) {
-    return '<div class="tags"><span class="chip' + (p.best ? ' hero-t' : '') + '">' + p.tag + '</span>' +
-      (p.low ? '<span class="chip low" title="Sirf dates ya gud se meetha. Sugar-free nahi.">Kam meetha · no refined sugar</span>' : '') + '</div>';
+  function src(label, check) { return '<span class="src' + (check ? ' chk' : '') + '">' + label + (check ? ' · figure confirm hona baaki' : '') + '</span>'; }
+  function feats(p) {
+    var f = [];
+    if (p.low) f.push('No refined sugar');
+    if (p.cat !== 'combo') f.push('Lab-tested batch'); else f.push('Save up to ' + Math.round((1 - p.price / (p.mrp || p.price)) * 100 || 0) + '%');
+    f.push('Ek haath se');
+    return '<ul class="feat">' + f.filter(function (x) { return x.indexOf('0%') < 0; }).map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
   }
   function card(p) {
-    return '<article class="card prod lift"><a class="pic" href="#/p/' + p.id + '" aria-label="' + p.name + ' dekho">' + p.e + '</a><div class="body">' + chips(p) +
-      '<h3><a href="#/p/' + p.id + '">' + p.name + '</a></h3><p>' + p.line + '</p>' +
-      '<div class="buy"><div class="price">' + rupee(p.price) + '<small>' + p.unit + '</small></div>' +
-      '<div class="acts"><a class="btn btn-g btn-sm" href="#/p/' + p.id + '">Details</a><button class="btn btn-p btn-sm" data-add="' + p.id + '">+ Thaila</button></div></div></div></article>';
+    return '<article class="pc lift"><a class="pc-img tone-' + p.cat + '" href="#/p/' + p.id + '" aria-label="' + p.name + '">' + art(p.art, 'big') +
+      '<span class="pc-badge">' + p.badge + '</span></a><div class="pc-body">' +
+      '<h3><a href="#/p/' + p.id + '">' + p.name + '</a></h3><p class="pc-short">' + p.short + '</p>' + feats(p) +
+      '<div class="pc-foot"><div class="price">' + rupee(p.price) + (p.mrp ? ' <s>' + rupee(p.mrp) + '</s>' : '') + '<small>' + p.unit + '</small></div>' +
+      '<button class="btn btn-p btn-sm" data-add="' + p.id + '">Add</button></div>' +
+      (p.cat !== 'combo' ? '<p class="pc-sub">' + art('repeat') + 'Subscribe karo, ' + SUB_OFF + '% bachao</p>' : '') + '</div></article>';
   }
-  function grid(list, n) { return '<div class="grid g' + (n || 3) + '">' + list.map(card).join('') + '</div>'; }
+  function grid(list, n) { return '<div class="grid g' + (n || 4) + ' pgrid">' + list.map(card).join('') + '</div>'; }
   function acc(h, body, open) { return '<details class="acc"' + (open ? ' open' : '') + '><summary>' + h + '</summary><div>' + body + '</div></details>'; }
-  var endCta = '<section class="center"><div class="wrap"><p class="pain">Padh liya? Ab kuch kha lo.</p><h2>Nani ki rasoi, <em>ek click door</em></h2><div class="row"><a class="btn btn-p" href="#/shop">Shop karo</a><a class="btn btn-g" href="#/shop/combo">Combos dekho</a></div></div></section>';
+  function head(kicker, h, link, label, pain) {
+    return '<div class="head"><div><span class="kicker">' + kicker + '</span>' + (pain ? '<p class="pain">' + pain + '</p>' : '') + '<h2>' + h + '</h2></div>' + (link ? '<a class="btn btn-g btn-sm" href="' + link + '">' + label + ' →</a>' : '') + '</div>';
+  }
+  var endCta = '<section class="center"><div class="wrap"><p class="pain">Padh liya? Ab kuch kha lo.</p><h2>Nani ki rasoi, <em>ek click door</em></h2><div class="row"><a class="btn btn-p" href="#/shop">Shop karo</a><a class="btn btn-g" href="#/quiz">2-minute quiz</a></div></div></section>';
+  var proofBand = '<div class="proofband"><div class="pb-item">' + art('shield') + '<div><strong>Certified organic ghee</strong><small>Organic certificate <span class="tag-pend">pending</span></small></div></div>' +
+    '<div class="pb-item">' + art('flask') + '<div><strong>Har batch lab-tested</strong><small>Pesticides, heavy metals, milaavat</small></div></div>' +
+    '<div class="pb-item">' + art('qr') + '<div><strong>QR scan karo, report dekho</strong><small>Har pack par <span class="tag-pend">pending</span></small></div></div>' +
+    '<a class="btn btn-w btn-sm" href="#/proof">Lab reports dekho</a></div>';
 
   /* ---------- pages ---------- */
   var pages = {};
-
+  var SLIDES = [
+    { tone: 'terra', k: 'Nani ke laddoo, ab aapke shehar mein', h: 'Delivery ke baad ka khana, <em>jaise nani ke ghar mein</em>', p: 'Taaza, saaf, pahadi ingredients se bane laddoo, panjiri, kheer aur soup — ek haath se khane laayak.', c: ['#/shop', 'Abhi shop karo'], c2: ['#/quiz', '2-minute quiz'], arts: ['laddoo', 'mother', 'millet'] },
+    { tone: 'sage', k: 'Subscribe & Save', h: 'Har 2 hafte taaza dabba, <em>' + SUB_OFF + '% kam mein</em>', p: 'Laddoo khatam hone se pehle naya dabba. Kabhi bhi skip, roko ya cancel karo.', c: ['#/p/gond', 'Gond Laddoo subscribe karo'], arts: ['repeat', 'jar', 'truck'] },
+    { tone: 'ink', k: 'Bundles', h: 'Pehle 10 din se <em>poore 40 din tak</em>', p: 'Sochna nahi padega — din-ba-din card ke saath poora dabba.', c: ['#/shop/combo', 'Bundles dekho'], arts: ['gift', 'calendar', 'bowl'] }
+  ];
   pages.home = function () {
-    return '<section class="hero"><div class="wrap hero-grid"><div>' +
-      '<span class="kicker">हिम + मायका · Himalaya se, maike jaisa</span>' +
-      '<h1>Delivery ke baad ka khana, <em>jaise nani ke ghar mein</em></h1>' +
-      '<p class="lede">Shehar mein baby aayi, par nani nahi aa payi. Toh unke laddoo, panjiri, kheer aur soup hum bhej dete hain — pahadi anaaj aur Badri cow ghee se bane, ek haath se khane laayak.</p>' +
-      '<div class="row"><a class="btn btn-p" href="#/shop">Abhi shop karo</a><a class="btn btn-g" href="#/quiz">2-minute quiz</a></div></div>' +
-      '<div class="hero-art" aria-hidden="true"><div class="plate"><div class="big">🥣</div><small>maa ki thali</small></div>' +
-      '<div class="float">🌾 Mandua · Jhangora</div><div class="float">🧈 Badri cow ghee</div><div class="float">🤱 Ek haath se</div></div>' +
-      '</div><div class="hills-wrap">' + hills('transparent', '#E8D5BC', '#7D8450', '#3A2A1E') + '</div></section>' +
+    return '<section class="hero2"><div class="slides">' + SLIDES.map(function (s, i) {
+      return '<div class="slide tone-' + s.tone + (i ? '' : ' on') + '" role="group" aria-label="Banner ' + (i + 1) + ' of 3"' + (i ? ' aria-hidden="true"' : '') + '><div class="wrap slide-in"><div class="slide-copy"><span class="kicker">' + s.k + '</span>' +
+        (i ? '<h2 class="h1">' + s.h + '</h2>' : '<h1>' + s.h + '</h1>') + '<p>' + s.p + '</p><div class="row"><a class="btn btn-p" href="' + s.c[0] + '">' + s.c[1] + '</a>' + (s.c2 ? '<a class="btn btn-g" href="' + s.c2[0] + '">' + s.c2[1] + '</a>' : '') + '</div></div>' +
+        '<div class="slide-art">' + art(s.arts[0], 'a1') + art(s.arts[1], 'a2') + art(s.arts[2], 'a3') + '<span class="photo-note">photo shoot ke baad asli tasveer</span></div></div></div>';
+    }).join('') + '</div><div class="dots2">' + SLIDES.map(function (_, i) { return '<button data-slide="' + i + '" aria-label="Banner ' + (i + 1) + '"' + (i ? '' : ' class="on"') + '></button>'; }).join('') + '</div></section>' +
 
-      '<div class="dark trust"><div class="wrap"><ul><li>Pahadi anaaj</li><li>Organic Badri cow ghee <span class="tag-pend">certificate pending</span></li><li>Lab report har batch <span class="tag-pend">pending</span></li><li>No refined sugar</li><li>Ek haath se khane laayak</li></ul></div></div>' +
+      '<div class="usp"><div class="wrap usp-in">' +
+      [['shield', 'Certified organic ghee', 'pending'], ['flask', 'Har batch lab-tested', ''], ['seeds', 'No refined sugar', ''], ['hand', 'Ek haath se khane laayak', ''], ['leaf', 'Taaza, chhote batch', '']].map(function (u) { return '<div class="u">' + art(u[0]) + '<span>' + u[1] + (u[2] ? ' <span class="tag-pend">' + u[2] + '</span>' : '') + '</span></div>'; }).join('') + '</div></div>' +
 
-      '<section><div class="wrap"><span class="kicker">Shop by category</span><h2>Aaj kya chahiye?</h2>' +
-      '<div class="grid g4 cats" style="margin-top:20px">' + CATS.map(function (c) {
-        return '<a class="cat lift" href="#/shop/' + c.id + '"><span class="ce">' + c.e + '</span><strong>' + c.name + '</strong><small>' + c.line + '</small></a>';
-      }).join('') + '</div></div></section>' +
+      '<section><div class="wrap">' + head('Shop by category', 'Aaj kya chahiye?') +
+      '<div class="cats2">' + CATS.map(function (c) { return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '">' + art(c.art, 'big') + '<strong>' + c.name + '</strong><small>' + c.line + '</small></a>'; }).join('') + '</div></div></section>' +
 
-      '<section class="alt"><div class="wrap"><div class="head"><div><span class="kicker">Best sellers</span><h2>Nani ki rasoi ke <em>chaar sitaare</em></h2></div><a class="btn btn-g btn-sm" href="#/shop">Sab dekho</a></div>' +
-      grid(P.filter(function (p) { return p.best; }), 4) + '</div></section>' +
+      '<section class="alt"><div class="wrap">' + head("Nani's picks", 'Sabse zyada <em>pasand kiye jaane waale</em>', '#/shop', 'Sab dekho') + grid(P.filter(function (p) { return p.best; }), 4) + '</div></section>' +
 
-      '<section><div class="wrap split"><div><span class="kicker">Humari kahani</span>' +
-      '<h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
-      '<p class="lede">"Baby ne doodh piya? Baby soya?" — aur aapne subah se kya khaya, yeh kisi ne nahi poochha. Pehle nani poochhti thi, aur poochh ke rukti nahi thi — khila ke hi maanti thi. Himmaika wahi nani hai, ek dabbe mein.</p>' +
-      '<a class="btn btn-g" href="#/story">Poori kahani padho</a></div>' +
-      '<div class="card warm storycard"><div style="font-size:3rem">👵🏔️</div><p class="quote" style="font-size:1.5rem;max-width:none">"Har nayi maa ko uske 40 din ka haq mile, chahe ghar mein koi bada ho ya na ho."<span>Humara mission</span></p></div></div></section>' +
+      '<section><div class="wrap">' + head('Shop by need', 'Aapko abhi <em>kis cheez ki zaroorat hai?</em>', '', '', 'Har maa ka din alag hai. Apni zaroorat chuno.') +
+      '<div class="needs" role="tablist">' + NEEDS.map(function (n, i) { return '<button role="tab" data-need="' + n.id + '" aria-selected="' + !i + '">' + art(n.art) + n.name + '</button>'; }).join('') + '</div>' +
+      '<div id="needGrid">' + needGrid(NEEDS[0].id) + '</div></div></section>' +
 
-      '<section class="alt"><div class="wrap"><div class="head"><div><span class="kicker">Combos</span><p class="pain">Roz sochna ki aaj kya khaun? Mat socho.</p><h2>Poora dabba, <em>ek baar mein</em></h2></div><a class="btn btn-g btn-sm" href="#/plan">40-Day Plan samjho</a></div>' +
-      grid(P.filter(function (p) { return p.cat === 'combo'; }), 3) + '</div></section>' +
+      '<section class="aplus-band"><div class="wrap split"><div class="ab-art">' + art('mother', 'huge') + '</div><div><span class="kicker">Sach baat</span><h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
+      '<p class="lede">"Baby ne doodh piya? Baby soya?" — aur aapne subah se kya khaya, yeh kisi ne nahi poochha. Shehar mein nani nahi hai, rasoi mein koi nahi, aur research karne ka time bilkul nahi. Isliye Himmaika: nani ki rasoi, saaf aur taaza, seedha aapke darwaze par.</p>' +
+      '<a class="btn btn-g" href="#/story">Humari kahani</a></div></div></section>' +
 
-      '<div class="band"><div class="wrap"><div class="hand">🤱</div><h2>Sab kuch ek haath se khane laayak.</h2><p>Kyunki doosre haath mein baby hai. Har laddoo, har jar, har sachet isi niyam pe pass hota hai.</p></div></div>' +
+      '<section><div class="wrap"><div class="center"><span class="kicker">Andar kya hai</span><h2>Saaf. Taaza. <em>Pahadi.</em></h2><p class="lede">Hum label par wahi likhte hain jo dabbe mein hai. Pahad ke anaaj, asli nuts aur beej, dates ya gud ka meetha.</p></div>' +
+      '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet'], ['millet', 'Jhangora', 'High-fibre barnyard millet'], ['seeds', 'Gahat', 'Pahadi protein daal'], ['nut', 'Makhana', 'Halka, crunchy'], ['seeds', 'Til', 'Calcium aur iron waala beej'], ['drop', 'Gond', 'Jaape ki parampara']].map(function (x) { return '<div class="ing">' + art(x[0], 'big') + '<strong>' + x[1] + '</strong><small>' + x[2] + '</small></div>'; }).join('') + '</div>' +
+      '<p class="center note" style="margin-top:18px">' + art('pot', 'inline') + ' Aur jahan ghee chahiye, wahan organic Badri cow ghee — humare parivaar ki supply chain se.</p></div></section>' +
 
-      '<section><div class="wrap"><div class="center"><span class="kicker">Yeh khana kyun?</span>' +
-      '<p class="pain">"Itna kyun khilati thi nani?" — kyunki unhe hisaab pata tha.</p>' +
-      '<h2>Aapka sharir abhi <em>do logon ka kaam</em> kar raha hai</h2></div>' +
-      '<div class="stats" style="margin-top:26px">' +
-      '<div class="stat"><div class="num">~530–600 kcal</div><p>roz extra chahiye feeding maa ko, pehle 6 mahine.</p>' + src('ICMR-NIN 2020', true) + '</div>' +
-      '<div class="stat"><div class="num">1,200 mg</div><p>calcium roz — feeding maa ki zaroorat.</p>' + src('ICMR-NIN 2020') + '</div>' +
-      '<div class="stat"><div class="num">57%</div><p>Indian mahilaon (15–49) mein khoon ki kami hai.</p>' + src('NFHS-5, 2019–21') + '</div>' +
-      '</div><div class="center" style="margin-top:26px"><a class="btn btn-g" href="#/samajh">40 din ki poori samajh</a></div></div></section>' +
+      '<section class="alt"><div class="wrap">' + head('Kyun Himmaika', 'Ghar pe banana, dukaan se lena, <em>ya Himmaika?</em>') + compareTable() + '</div></section>' +
 
-      '<section class="alt"><div class="wrap"><div class="head"><div><span class="kicker">Our proof</span><p class="pain">Label padhne ka time kiske paas hai?</p><h2>30 second mein <em>bharosa</em></h2></div><a class="btn btn-g btn-sm" href="#/proof">Saara proof</a></div>' +
-      '<div class="grid g4">' +
-      pf('🧈', 'Organic Badri cow ghee', 'certificate pending') + pf('🏔️', 'GI-registered naam: Uttarakhand Badri Cow Ghee', 'eligibility confirm honi baaki') +
-      pf('🧪', 'Har batch ki lab report, QR se', 'lab partner pending') + pf('🌴', 'Meetha sirf dates ya gud se', '') + '</div></div></section>' +
+      '<section><div class="wrap"><div class="center"><span class="kicker">Subscribe & Save</span><h2>Laddoo khatam hone se <em>pehle naya dabba</em></h2></div>' +
+      '<div class="steps">' + [['laddoo', 'Product chuno', 'Laddoo, panjiri, sachets — jo roz chahiye.'], ['repeat', 'Har 2, 3 ya 4 hafte', 'Jitni jaldi khatam hota hai, utni baar.'], ['truck', SUB_OFF + '% bachao, har baar', 'Skip, roko ya cancel — ek WhatsApp se.']].map(function (s, i) { return '<div class="step"><span class="sn">' + (i + 1) + '</span>' + art(s[0], 'big') + '<h3>' + s[1] + '</h3><p>' + s[2] + '</p></div>'; }).join('') + '</div>' +
+      '<div class="center" style="margin-top:22px"><a class="btn btn-p" href="#/p/gond">Subscribe karke dekho</a></div></div></section>' +
 
-      '<section><div class="wrap"><div class="center"><span class="kicker">Hum saath hain</span><h2>Khareedna hi nahi, <em>saath bhi</em></h2></div><div class="grid g3" style="margin-top:26px">' +
-      '<a class="cat lift" href="#/gift"><span class="ce">🎁</span><strong>Gift a 40</strong><small>Aap wahan nahi ho sakte? Aapka khana aur chitthi pahunch sakti hai.</small></a>' +
-      '<a class="cat lift" href="#/quiz"><span class="ce">🍽️</span><strong>Meri Thali Banao</strong><small>Samajh nahi aa raha kya lein? 4 sawaal, 2 minute.</small></a>' +
-      '<a class="cat lift" href="#/nutritionist"><span class="ce">👩‍⚕️</span><strong>Nutritionist se baat</strong><small>Ek insaan jo sirf aapki thali dekhe, aapki bhasha mein.</small></a>' +
-      '</div></div></section>' +
+      '<section class="planband"><div class="wrap split"><div><span class="kicker">Ek option yeh bhi</span><h2>Poore 40 din ka <em>dabba</em></h2><p>Agar aap sochna hi nahi chahte: teen phase, teen taaza shipments, din-ba-din card. Delivery se pehle book karo.</p><div class="row"><a class="btn btn-w" href="#/p/p40">40 Din Box · ' + rupee(4999) + '</a><a class="btn btn-ghost-w" href="#/plan">Plan samjho</a></div></div><div class="ab-art">' + art('calendar', 'huge') + '</div></div></section>' +
 
-      '<section class="alt"><div class="wrap center"><span class="kicker">Maaon ki baat</span><h2>Reviews yahan aayenge</h2><p class="lede">Abhi hum launch nahi hue hain, isliye yahan koi review nahi hai. Nakli sitaare hum nahi lagate — pehli asli maaon ki baatein launch ke baad yahan dikhengi.</p></div></section>';
+      '<section><div class="wrap narrow">' + naniNote('Beta, baby ke saath tum bhi nayi paida hui ho. Pehle 40 din apne aap ko utna hi pyaar do jitna use de rahi ho. Khana main bhej rahi hoon — tum bas samay pe kha lena.') + '</div></section>' +
+
+      '<section class="alt"><div class="wrap">' + head('Our proof', 'Vaade nahi, <em>lab report</em>', '', '', 'Label padhne ka time kiske paas hai?') + proofBand + '</div></section>' +
+
+      '<section><div class="wrap center"><span class="kicker">Maaon ki baat</span><h2>Reviews launch ke baad</h2><p class="lede">Hum abhi launch nahi hue, isliye yahan koi review nahi hai. Nakli sitaare hum nahi lagate.</p>' +
+      '<div class="rev-ph">' + [1, 2, 3].map(function () { return '<div class="card">' + art('heart') + '<p class="note">Pehli asli maa ka review yahan aayega.</p></div>'; }).join('') + '</div></div></section>' +
+
+      '<section class="news"><div class="wrap news-in"><div><h2>Nani ki chitthi, <em>har hafte</em></h2><p>Har hafte ek chhoti si baat — kya khaayein, kaise aaram karein. Spam nahi.</p></div>' +
+      '<form id="newsForm" class="news-form"><label for="newsIn" class="sr">Email ya WhatsApp</label><input id="newsIn" type="text" placeholder="Email ya WhatsApp number" autocomplete="off"><button class="btn btn-p">Judo</button></form></div></section>';
   };
-  function pf(ic, h, pend) { return '<div class="card"><div style="font-size:1.8rem">' + ic + '</div><h3>' + h + '</h3>' + (pend ? '<span class="tag-pend">' + pend + '</span>' : '') + '</div>'; }
+  function needGrid(id) { return grid(P.filter(function (p) { return p.needs.indexOf(id) >= 0; }).slice(0, 4), 4); }
+  function compareTable() {
+    var rows = [['Time', '3–4 ghante, har baar', '5 minute', '0 — dabba kholo'], ['Meetha', 'Aapke haath mein', 'Aksar refined sugar', 'Sirf dates ya gud'], ['Ingredients', 'Dhoondhne padte hain', 'Label padhna padta hai', 'Pahadi anaaj, poori list pack par'], ['Lab report', '—', 'Aksar nahi', 'Har batch, QR se'], ['Jaape ke hisaab se', 'Agar koi bada ho', 'Nahi', 'Haan — din-ba-din']];
+    return '<div class="tbl-wrap"><table class="cmp"><thead><tr><th></th><th>Ghar pe banana</th><th>Aam dukaan ka laddoo</th><th class="us">Himmaika</th></tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td class="us">' + r[3] + '</td></tr>'; }).join('') + '</tbody></table></div><p class="note">Yeh aam tulna hai, kisi khaas brand ke baare mein nahi.</p>';
+  }
+  function naniNote(t) { return '<div class="nani">' + art('heart', 'big') + '<div><span class="kicker">Nani ka note</span><p>' + t + '</p><span class="sig">— Nani</span></div></div>'; }
 
   pages.shop = function (cat) {
     var c = CATS.filter(function (x) { return x.id === cat; })[0];
     var list = c ? P.filter(function (p) { return p.cat === cat; }) : P;
-    return '<section><div class="wrap"><span class="kicker">' + (c ? 'Shop · ' + c.name : 'Shop all') + '</span>' +
-      '<p class="pain">"Kya khau, kab khau?" — Google pe 50 jawab hain, aur aapke paas 5 minute bhi nahi.</p>' +
-      '<h1>' + (c ? c.name + ' <em>' + c.line.toLowerCase() + '</em>' : 'Das cheezein, teen dabbe. <em>Bas.</em>') + '</h1>' +
-      '<div class="filters">' + [{ id: '', name: 'Sab' }].concat(CATS).map(function (x) {
+    return '<section class="shop-hero tone-' + (c ? c.id : 'all') + '"><div class="wrap split"><div><nav class="crumb"><a href="#/">Home</a> / <span>' + (c ? c.name : 'Shop all') + '</span></nav>' +
+      '<h1>' + (c ? c.name : 'Nayi maa ki <em>poori rasoi</em>') + '</h1><p class="lede">' + (c ? c.line + '. ' : '') + (cat === 'combo' ? 'Bundles mein sabse zyada bachat — aur sochna nahi padta.' : 'Har cheez saaf, taaza ingredients se, ek haath se khane laayak. Meetha sirf dates ya gud se.') + '</p></div><div class="ab-art">' + art(c ? c.art : 'laddoo', 'huge') + '</div></div></section>' +
+      '<section style="padding-top:28px"><div class="wrap"><div class="toolbar"><div class="filters">' + [{ id: '', name: 'Sab' }].concat(CATS).map(function (x) {
         return '<a href="#/shop' + (x.id ? '/' + x.id : '') + '"' + ((x.id || '') === (cat || '') ? ' class="on" aria-current="true"' : '') + '>' + x.name + '</a>';
-      }).join('') + '</div>' + grid(list, 3) +
-      '<div class="honest" style="margin-top:30px"><div class="ic">🤝</div><p><strong>Imaandaari ki baat:</strong> Hum "doodh badhega" ya "kamzori door hogi" jaise vaade nahi karte. Yeh paramparik khana hai, dawai nahi. Meetha sirf dates ya gud se, refined sugar bilkul nahi. "Kam meetha" ka matlab sugar-free nahi hai.</p></div>' +
+      }).join('') + '</div><label class="sort">Sort <select id="sortSel"><option value="pop">Nani\'s picks pehle</option><option value="lo">Keemat: kam se zyada</option><option value="hi">Keemat: zyada se kam</option></select></label></div>' +
+      '<div id="shopGrid" data-cat="' + (cat || '') + '">' + grid(list, 3) + '</div>' +
+      (cat === 'combo' ? '<div class="honest" style="margin-top:26px">' + art('calendar') + '<p><strong>40 din ka plan kaise kaam karta hai?</strong> Teen phase, teen shipments. <a href="#/plan">Poora plan samjho</a> · <a href="#/gift">Kisi ko gift karna hai?</a></p></div>' : '') +
+      '<div class="honest" style="margin-top:20px">' + art('heart') + '<p><strong>Imaandaari ki baat:</strong> Hum "doodh badhega" ya "kamzori door hogi" jaise vaade nahi karte. Yeh paramparik khana hai, dawai nahi. "Kam meetha" ka matlab sugar-free nahi hai.</p></div>' +
       '</div></section>';
   };
 
   pages.p = function (id) {
     var p = byId(id); if (!p) return pages.shop();
-    var c = CATS.filter(function (x) { return x.id === p.cat; })[0];
-    var rel = P.filter(function (x) { return x.id !== p.id && (p.cat === 'combo' ? x.best : x.cat === p.cat || x.best); }).slice(0, 3);
-    var combo = p.cat === 'combo';
+    var c = CATS.filter(function (x) { return x.id === p.cat; })[0], combo = p.cat === 'combo';
+    var addons = P.filter(function (x) { return x.id !== p.id && x.cat !== 'combo'; }).sort(function (a, b) { return (b.best ? 1 : 0) - (a.best ? 1 : 0); }).slice(0, 3);
+    var rel = P.filter(function (x) { return x.id !== p.id && x.cat === p.cat; }).concat(P.filter(function (x) { return x.best && x.cat !== p.cat; })).slice(0, 4);
     return '<section class="pdp"><div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="#/">Home</a> / <a href="#/shop/' + c.id + '">' + c.name + '</a> / <span>' + p.name + '</span></nav>' +
-      '<div class="pdp-grid"><div class="gal"><div class="main" aria-hidden="true">' + p.e + '<small>product photo aani baaki</small></div>' +
-      '<div class="thumbs" aria-hidden="true"><span>' + p.e + '</span><span>🧈</span><span>🏔️</span><span>🧪</span></div></div>' +
-      '<div class="info">' + chips(p) + '<h1>' + p.name + '</h1><p class="pain">' + p.moment + '</p><p class="lede">' + p.line + '</p>' +
-      '<div class="price big">' + rupee(p.price) + '<small>' + p.unit + ' · saare tax shaamil · prototype keemat</small></div>' +
-      '<div class="buyrow"><div class="qty lg"><button data-q="-1" aria-label="Kam karo">−</button><b id="pq">1</b><button data-q="1" aria-label="Badhao">+</button></div>' +
-      '<button class="btn btn-p" data-addq="' + p.id + '">Thaile mein daalo</button><button class="btn btn-g" data-buy="' + p.id + '">Abhi kharido</button></div>' +
-      '<ul class="badges"><li>🤱 Ek haath se</li><li>🧈 Badri cow ghee</li><li>🌴 No refined sugar</li><li>🧪 Batch lab report <span class="tag-pend">pending</span></li></ul>' +
-      acc(combo ? 'Dabbe mein kya hai' : 'Andar kya hai', '<p>' + p.ing + '</p><p class="note">Yeh ingredients ki shuruaati list hai; final recipe aur poori list pack par chhapegi. Allergens: nuts, til, doodh se bani cheezein ho sakti hain.</p>', true) +
-      acc('Kaise khayein', '<p>' + p.how + '</p>') +
-      acc('Yeh kyun', '<p>' + p.sci + '</p><p class="note">Yeh aam poshan ki jaankari hai, koi ilaaj ka daava nahi. <a href="#/samajh">Poori samajh padho</a>.</p>') +
-      acc('Nutrition aur shelf life', '<p>Nutrition table (energy, protein, fat, sugar, per 100g aur per serving), best-before aur storage — lab testing ke baad yahan aur pack par aayenge.</p><span class="tag-pend">lab values pending</span>') +
-      acc('Delivery aur wapsi', '<p>Dehradun se taaza bana kar bheja jaata hai. Shipping time, charges aur return policy launch par final hongi.</p><span class="tag-pend">prototype</span>') +
+      '<div class="pdp-grid"><div class="gal"><div class="main tone-' + p.cat + '">' + art(p.art, 'huge') + '<span class="pc-badge">' + p.badge + '</span><span class="photo-note">photo shoot ke baad asli tasveer</span></div>' +
+      '<div class="thumbs">' + [p.art, p.ing[0][0], 'hand', 'flask'].map(function (a, i) { return '<span class="tone-' + p.cat + (i ? '' : ' on') + '">' + art(a) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="info"><h1>' + p.name + '</h1><p class="lede">' + p.short + '</p>' +
+      '<div class="rating">' + art('heart') + ' Naya launch · reviews jald</div>' + feats(p) +
+      '<div class="price big" id="pPrice"></div>' +
+      (combo ? '' : '<div class="lab">Pack chuno</div><div class="packs" id="packs">' + PACKS.map(function (k, i) {
+        return '<button type="button" data-pack="' + i + '" aria-pressed="' + !i + '">' + (k.tag ? '<em>' + k.tag + '</em>' : '') + '<strong>' + k.l + '</strong><small>' + rupee(p.price * k.n * (1 - k.off / 100)) + (k.off ? ' · ' + k.off + '% off' : '') + '</small></button>';
+      }).join('') + '</div>' +
+      '<div class="lab">Kaise lena hai?</div><div class="ptype" id="ptype"><label class="opt"><input type="radio" name="pt" value="once" checked><span><strong>Ek baar</strong><small>Abhi ke liye</small></span></label>' +
+      '<label class="opt sub"><input type="radio" name="pt" value="sub"><span><strong>Subscribe & Save ' + SUB_OFF + '%</strong><small>Har <select id="every" aria-label="Kitne hafte mein"><option>2</option><option selected>3</option><option>4</option></select> hafte taaza dabba · kabhi bhi skip ya cancel</small></span></label></div>') +
+      '<div class="buyrow" id="buyrow"><button class="btn btn-p btn-lg" data-addp="' + p.id + '">Thaile mein daalo</button><button class="btn btn-g btn-lg" data-buyp="' + p.id + '">Abhi kharido</button></div>' +
+      '<div class="pin"><input id="pinIn" type="text" inputmode="numeric" maxlength="6" placeholder="Pincode daalo"><button class="btn btn-g btn-sm" data-pin>Delivery check</button></div>' +
+      '<div class="offers"><strong>Offers</strong> <span class="tag-pend">prototype</span><ul><li>' + art('repeat') + 'Subscribe karo, har order par ' + SUB_OFF + '% off</li><li>' + art('truck') + rupee(FREE_SHIP) + ' se upar free delivery</li><li>' + art('gift') + 'Gift note muft — thaile mein tick karo</li></ul></div>' +
+      '<div class="iconrow">' + [['flask', 'Lab-tested batch'], ['shield', 'Certified organic ghee'], ['seeds', 'No refined sugar'], ['hand', 'Ek haath se']].map(function (x) { return '<div>' + art(x[0]) + '<span>' + x[1] + '</span></div>'; }).join('') + '</div>' +
+      (combo ? '' : '<div class="addons"><strong>⭐ Zyadatar maayein saath mein lete hain</strong>' + addons.map(function (a) { return '<div class="ao"><span class="ao-art tone-' + a.cat + '">' + art(a.art) + '</span><a href="#/p/' + a.id + '">' + a.name + '<small>' + rupee(a.price) + '</small></a><button class="btn btn-g btn-sm" data-add="' + a.id + '">+ Add</button></div>'; }).join('') + '</div>') +
       '</div></div></div></section>' +
 
-      '<section class="alt"><div class="wrap"><h2>Log yeh bhi poochhte hain</h2><div class="faq">' +
-      acc('Kya isse doodh badhega?', '<p>Hum aisa koi vaada nahi karte. Yeh paramparik khana hai jo nayi maa ka pet bharta hai. Feeding mein dikkat ho toh lactation consultant ya doctor se milein.</p>') +
-      acc('C-section ke baad kha sakti hoon?', '<p>Pehle 10 din halka aur naram khana aasaan padta hai — kheer, khichdi, soup. Bhaari laddoo kab shuru karein, yeh apne doctor se poochh lein.</p>') +
-      acc('Diabetes ya BP hai, toh?', '<p>Humare kai products mein dates ya gud ka meetha aur ghee hai. Inhe lene se pehle apne doctor se zaroor poochhein.</p>') +
-      acc('Kya main kisi aur ke liye bhej sakti / sakta hoon?', '<p>Haan. Thaile mein "Yeh gift hai" chuno aur apni chitthi likh do — dabbe ke saath jaayegi.</p>') +
+      /* A+ content */
+      '<section class="aplus1 tone-' + p.cat + '"><div class="wrap split"><div><span class="kicker">Aapka yeh pal</span><p class="pain big">"' + p.moment + '"</p><h2>' + p.name + ' — <em>isi pal ke liye bana</em></h2><p class="lede">' + p.short + '</p></div><div class="ab-art">' + art(p.art, 'huge') + art('mother', 'a2') + '</div></div></section>' +
+      '<section><div class="wrap"><div class="center"><span class="kicker">Kya milega</span><h2>' + (combo ? 'Is dabbe mein <em>kya khaas hai</em>' : 'Kyun khaayein <em>' + p.name + '</em>') + '</h2></div>' +
+      '<div class="bens">' + p.ben.map(function (b) { return '<div class="ben">' + art(b[0], 'big') + '<h3>' + b[1] + '</h3><p>' + b[2] + '</p></div>'; }).join('') + '</div>' +
+      '<p class="note center">Yeh ingredients aur aam poshan ki jaankari hai, koi ilaaj ka daava nahi. Numbers: ICMR-NIN 2020, NFHS-5. <a href="#/samajh">Poori samajh</a></p></div></section>' +
+      '<section class="alt"><div class="wrap"><div class="center"><span class="kicker">' + (combo ? 'Dabbe mein' : 'Andar kya hai') + '</span><h2>' + (combo ? 'Kya-kya <em>aata hai</em>' : 'Har ingredient, <em>ek wajah se</em>') + '</h2></div>' +
+      '<div class="ings">' + p.ing.map(function (g) { return '<div class="ing2' + (g[3] ? ' support' : '') + '">' + art(g[0], 'big') + '<div><strong>' + g[1] + '</strong>' + (g[3] ? ' <span class="chip">sahayak</span>' : '') + (g[2] ? '<p>' + g[2] + '</p>' : '') + '</div></div>'; }).join('') + '</div></div></section>' +
+      '<section><div class="wrap split"><div><span class="kicker">Kab aur kaise</span><h2>Din mein <em>kahan fit hota hai</em></h2><div class="when">' + p.when.map(function (w) { return '<div class="w">' + art(w[0], 'big') + '<div><strong>' + w[1] + '</strong><p>' + w[2] + '</p></div></div>'; }).join('') + '</div><p class="note">' + p.how + '</p></div>' +
+      '<div><span class="kicker">Kiske liye</span><h2>Yeh aapke liye hai <em>agar...</em></h2><ul class="tick big"><li>Aapki delivery haal hi mein hui hai, ya hone waali hai</li><li>Rasoi mein madad nahi, ya time nahi</li><li>Aap label padhe bina bharosa karna chahti hain</li><li>Aapko ghar jaisa, paramparik swaad chahiye</li></ul></div></div></section>' +
+      '<section class="alt"><div class="wrap">' + head('Tulna', 'Ghar, dukaan, <em>ya Himmaika?</em>') + compareTable() + '</div></section>' +
+      '<section><div class="wrap">' + proofBand + '</div></section>' +
+      '<section class="alt"><div class="wrap narrow">' + naniNote(p.note) + '</div></section>' +
+      '<section><div class="wrap narrow"><h2>Poori jaankari</h2><div class="faq">' +
+      acc('Ingredients', '<p>' + p.list + '</p><p class="note">Shuruaati list; final recipe pack par chhapegi. Allergens: nuts, til, doodh se bani cheezein ho sakti hain.</p>', true) +
+      acc('Kaise khayein', '<p>' + p.how + '</p>') +
+      acc('Nutrition aur shelf life', '<p>Nutrition table (per 100g aur per serving), best-before aur storage — lab testing ke baad.</p><span class="tag-pend">lab values pending</span>') +
+      acc('Delivery, subscription aur wapsi', '<p>Dehradun se taaza bana kar bheja jaata hai. Subscription kabhi bhi skip, roko ya cancel. Shipping time aur return policy launch par final.</p><span class="tag-pend">prototype</span>') +
+      acc('Kya isse doodh badhega?', '<p>Hum aisa koi vaada nahi karte. Feeding mein dikkat ho toh lactation consultant ya doctor se milein.</p>') +
+      acc('C-section ke baad kha sakti hoon?', '<p>Pehle 10 din halka aur naram khana aasaan padta hai. Bhaari laddoo kab shuru karein, doctor se poochhein.</p>') +
+      acc('Diabetes ya BP hai, toh?', '<p>Kai products mein dates ya gud aur ghee hai. Pehle apne doctor se poochhein.</p>') +
       '</div></div></section>' +
-
-      '<section><div class="wrap"><h2>Saath mein <em>achha lagta hai</em></h2>' + grid(rel, 3) + '</div></section>';
+      '<section class="alt"><div class="wrap center"><span class="kicker">Reviews</span><h2>Pehle review ka intezaar</h2><p class="lede">Launch ke baad asli maaon ke reviews yahan aayenge.</p></div></section>' +
+      '<section><div class="wrap">' + head('Aur bhi', 'Saath mein <em>achha lagta hai</em>') + grid(rel, 4) + '</div></section>' +
+      '<div class="stickybuy" id="stickybuy"><div><strong>' + p.name + '</strong><small id="sbPrice"></small></div><button class="btn btn-p btn-sm" data-addp="' + p.id + '">Thaile mein daalo</button></div>';
   };
+  pages.p.after = function (id) { var p = byId(id); if (p) { pdp.p = p; pdp.pack = 0; pdp.sub = false; drawPrice(); } };
+  var pdp = { p: null, pack: 0, sub: false };
+  function unitPrice(p, pack, sub) { var k = PACKS[pack] || PACKS[0]; return p.price * k.n * (1 - k.off / 100) * (sub ? 1 - SUB_OFF / 100 : 1); }
+  function drawPrice() {
+    var p = pdp.p; if (!p || !$('#pPrice')) return;
+    var k = PACKS[pdp.pack], full = (p.mrp || p.price) * k.n, now = unitPrice(p, pdp.pack, pdp.sub);
+    $('#pPrice').innerHTML = rupee(now) + (now < full ? ' <s>' + rupee(full) + '</s> <span class="save">' + Math.round((1 - now / full) * 100) + '% bachat</span>' : '') + '<small>' + (p.cat === 'combo' ? p.unit : k.l + ' · ' + p.unit) + (pdp.sub ? ' · har ' + $('#every').value + ' hafte' : '') + ' · saare tax shaamil · prototype keemat</small>';
+    $('#sbPrice').textContent = rupee(now) + (pdp.sub ? ' · subscription' : '');
+  }
 
   pages.story = function () {
-    return '<section><div class="wrap"><span class="kicker">Our Story</span>' +
-      '<p class="pain">Shehar mein baby aayi, par nani nahi aa payi.</p>' +
-      '<h1>हिम + मायका. <em>Pahad se aaya maika.</em></h1>' +
-      '<p class="lede">Maika — woh ghar jahan delivery ke baad ek ladki ko sirf do kaam karne hote the: baby ko dekhna, aur khana. Baaki sab nani, maa, mausi sambhal leti thi. Himmaika usi maike ko ek dabbe mein rakhne ki koshish hai.</p></div></section>' +
-
-      '<section class="alt"><div class="wrap split"><div><span class="kicker">Shuruaat</span><h2>Ghee humare paas tha. <em>Sawaal tha — kiske liye?</em></h2>' +
-      '<p>Hum Dehradun se Barsana Magic chalate hain — pahadi Badri gaay ka ghee, shahad, tel, pahadi namak. Ghee ke dabbe bechte-bechte ek baat samajh aayi: ghee apne aap mein ek ingredient hai. Uski asli jagah kisi ki thali mein hai.</p>' +
-      '<p>Aur India mein ghee ki sabse purani, sabse zaroori thali ek hi hai — <strong>jaape ki thali</strong>. Gond ka laddoo, panjiri, methi — in sabki jaan ghee hai. Toh humne ghee ko wahan pahunchaya jahan uski sabse zyada zaroorat hai.</p>' +
-      '<span class="tag-pend">Founders ki kahani aur photo — add hona baaki</span></div>' +
-      '<div class="card warm"><h3>Jo humne dekha</h3><ul class="tick"><li>Nayi maa shehar mein akeli hai; nani hazaar kilometre door.</li><li>Pati madad karna chahta hai, par use pata nahi kya banana hai.</li><li>Maa door se sirf phone par poochh sakti hai: "Kuch khaya?"</li><li>Aur nayi maa ke paas research karne ka time bilkul nahi.</li></ul></div></div></section>' +
-
-      '<section><div class="wrap"><div class="center"><span class="kicker">Humare teen niyam</span><h2>Jo har dabbe par <em>laagu hote hain</em></h2></div>' +
-      '<div class="grid g3" style="margin-top:26px">' +
-      '<div class="card lift"><div style="font-size:2rem">🤱</div><h3>Ek haath se</h3><p>Sab kuch ek haath se khane laayak — kyunki doosre haath mein baby hai.</p></div>' +
-      '<div class="card lift"><div style="font-size:2rem">🧾</div><h3>Vaada nahi, kaagaz</h3><p>Certificate aur lab report dikhayenge. Jo abhi nahi hai, wahan "pending" likhenge.</p><a href="#/proof">Our Proof dekho</a></div>' +
-      '<div class="card lift"><div style="font-size:2rem">🙏</div><h3>Khilayenge, sudhaarenge nahi</h3><p>Koi jhootha daava nahi, koi taana nahi. Maa ko bas achha khana aur thoda aaram chahiye.</p></div>' +
-      '</div></div></section>' +
-
-      '<section class="alt"><div class="wrap split"><div><span class="kicker">Pahad se</span><h2>Mandua, jhangora, gahat — <em>aur Badri gaay</em></h2><p>Uttarakhand ke pahadon mein jaapa hamesha in hi cheezon se hua hai. Mandua ki roti, jhangore ki kheer, gahat ka soup, aur chhoti-si pahadi Badri gaay ka ghee. Hum kuch naya nahi bana rahe. Hum bas woh pahuncha rahe hain jo pahad ki nani pehle se jaanti thi.</p><a class="btn btn-g" href="#/samajh">Iske peeche ki samajh</a></div>' +
-      '<div><p class="quote" style="text-align:left;margin:0">"India ka sabse bharosemand pehle-40-din ka brand, Himalaya se."<span>Humara sapna</span></p></div></div></section>' + endCta;
+    return '<section class="shop-hero tone-laddoo"><div class="wrap split"><div><span class="kicker">Our Story</span><p class="pain">Shehar mein baby aayi, par nani nahi aa payi.</p><h1>हिम + मायका. <em>Pahad se aaya maika.</em></h1>' +
+      '<p class="lede">Maika — woh ghar jahan delivery ke baad ek ladki ko sirf do kaam karne hote the: baby ko dekhna, aur khana. Himmaika usi maike ki rasoi hai — taaza, saaf ingredients se bana nayi maa ka khana.</p></div><div class="ab-art">' + art('mother', 'huge') + '</div></div></section>' +
+      '<section><div class="wrap split"><div><span class="kicker">Jo humne dekha</span><h2>Nayi maa ke paas <em>sab kuch hai, siwaye time ke</em></h2><ul class="tick big"><li>Nani hazaar kilometre door.</li><li>Pati madad karna chahta hai, par use pata nahi kya banana hai.</li><li>Dukaan ke laddoo mein kya hai, koi nahi jaanta.</li><li>Google par 50 jawab, bharosa kisi par nahi.</li></ul></div>' +
+      '<div class="card warm"><h3>Toh humne kya kiya</h3><p>Humne nani ki jaape ki rasoi ko chhote, taaza batch mein banana shuru kiya: pahad ke anaaj, asli nuts aur beej, dates ya gud ka meetha, aur har batch ki lab report. Ghee chahiye toh humare parivaar ki organic Badri gaay ka ghee — Barsana Magic se.</p><span class="tag-pend">Founders ki kahani aur photo — add hona baaki</span></div></div></section>' +
+      '<section class="alt"><div class="wrap"><div class="center"><span class="kicker">Humare niyam</span><h2>Jo har dabbe par <em>laagu hote hain</em></h2></div><div class="bens">' +
+      [['leaf', 'Saaf ingredients', 'Label par wahi, jo dabbe mein. Refined sugar nahi.'], ['flask', 'Har batch ki lab report', 'QR scan karo, report dekho.'], ['hand', 'Ek haath se', 'Kyunki doosre haath mein baby hai.'], ['heart', 'Khilayenge, sudhaarenge nahi', 'Koi jhootha daava nahi, koi taana nahi.']].map(function (b) { return '<div class="ben">' + art(b[0], 'big') + '<h3>' + b[1] + '</h3><p>' + b[2] + '</p></div>'; }).join('') + '</div></div></section>' +
+      '<section><div class="wrap center"><p class="quote">"Har nayi maa ko uske 40 din ka haq mile, chahe ghar mein koi bada ho ya na ho."<span>Humara mission</span></p></div></section>' + endCta;
   };
 
   window.HM_INFO(pages, src, endCta);
   window.HM_MORE(pages, { $: $, rupee: rupee, toast: toast, byId: byId, endCta: endCta });
 
-  /* ---------- cart ---------- */
-  function cartCount() { var n = 0; for (var k in cart) n += cart[k]; return n; }
+  /* ---------- cart (drawer) ---------- */
+  function cartKey(id, pack, sub, every) { return id + '|' + pack + '|' + (sub ? every : 0); }
+  function addItem(id, pack, sub, every, silent) {
+    var k = cartKey(id, pack || 0, sub, every), it = cart.filter(function (x) { return x.k === k; })[0];
+    if (it) it.q++; else cart.push({ k: k, id: id, pack: pack || 0, sub: !!sub, every: every, q: 1 });
+    drawCart(); if (!silent) toast('🧺 ' + byId(id).name + (sub ? ' (subscription)' : '') + ' thaile mein');
+  }
   function drawCart() {
-    $('#cartCount').textContent = cartCount();
-    var ids = Object.keys(cart), tot = 0;
-    if (!ids.length) { $('#cartBody').innerHTML = '<p>Thaila khaali hai. Nani kehti: "Pehle ek laddoo toh rakh lo."</p><a class="btn btn-p" href="#/shop" data-close>Shop dekho</a>'; return; }
-    var note = gift && $('#giftNote') ? $('#giftNote').value : '';
-    var h = ids.map(function (id) {
-      var p = byId(id); tot += p.price * cart[id];
-      return '<div class="ci"><div class="e">' + p.e + '</div><div class="n">' + p.name + '<small>' + rupee(p.price) + ' · ' + p.unit + '</small></div><div class="qty"><button data-dec="' + id + '" aria-label="Kam karo">−</button><b>' + cart[id] + '</b><button data-inc="' + id + '" aria-label="Badhao">+</button></div></div>';
-    }).join('');
-    $('#cartBody').innerHTML = h +
+    var n = 0, tot = 0; cart.forEach(function (x) { n += x.q; tot += unitPrice(byId(x.id), x.pack, x.sub) * x.q; });
+    $('#cartCount').textContent = n;
+    var body = $('#cartBody');
+    if (!cart.length) { body.innerHTML = '<div class="empty">' + art('laddoo', 'big') + '<p>Thaila khaali hai. Nani kehti: "Pehle ek laddoo toh rakh lo."</p><a class="btn btn-p" href="#/shop" data-close>Shop dekho</a></div>'; return; }
+    var left = FREE_SHIP - tot, note = gift && $('#giftNote') ? $('#giftNote').value : '';
+    body.innerHTML = '<div class="ship"><p>' + (left > 0 ? rupee(left) + ' aur, phir delivery free' : '🎉 Free delivery mil gayi') + '</p><div class="bar"><i style="width:' + Math.min(100, tot / FREE_SHIP * 100) + '%"></i></div></div>' +
+      cart.map(function (x, i) { var p = byId(x.id); return '<div class="ci"><span class="ci-art tone-' + p.cat + '">' + art(p.art) + '</span><div class="n">' + p.name + '<small>' + (p.cat === 'combo' ? p.unit : PACKS[x.pack].l) + (x.sub ? ' · har ' + x.every + ' hafte · ' + SUB_OFF + '% off' : '') + '</small><small>' + rupee(unitPrice(p, x.pack, x.sub)) + '</small></div><div class="qty"><button data-dec="' + i + '" aria-label="Kam karo">−</button><b>' + x.q + '</b><button data-inc="' + i + '" aria-label="Badhao">+</button></div></div>'; }).join('') +
       '<label class="toggle" style="margin-top:14px"><input type="checkbox" id="giftChk"' + (gift ? ' checked' : '') + '><span>🎁 Yeh gift hai — chitthi saath bhejo</span></label>' +
       (gift ? '<textarea id="giftNote" style="margin-top:10px" placeholder="Beta, main aa nahi payi, par yeh laddoo meri taraf se roz ek khana..."></textarea>' : '') +
       '<div class="tot"><span>Kul</span><span>' + rupee(tot) + '</span></div><button class="btn btn-p" style="width:100%" data-checkout>Checkout karo</button><p class="note" style="margin-top:10px">Prototype: koi asli payment nahi hoga.</p>';
     if (gift) $('#giftNote').value = note;
   }
-  function add(id, n) { cart[id] = (cart[id] || 0) + (n || 1); drawCart(); toast('🧺 ' + byId(id).name + ' thaile mein aa gaya'); }
-  function openCart() { drawCart(); $('#cartModal').hidden = false; $('#cartModal .x').focus(); }
+  function openCart() { drawCart(); $('#cartModal').hidden = false; document.body.classList.add('lock'); $('#cartModal .x').focus(); }
+  function closeCart() { $('#cartModal').hidden = true; document.body.classList.remove('lock'); }
+
+  /* ---------- Nani chat (mock) ---------- */
+  var QA = [
+    ['C-section ke baad kya khaun?', 'Pehle 10 din halka aur garam: Jhangora Kheer, Khichdi Kit, ajwain ka paani. Bhaari laddoo kab shuru karein, apne doctor se zaroor poochhna. 💛', 'kheer'],
+    ['Kaunsa laddoo pehle lun?', 'Roz ki taaqat ke liye Gond Laddoo, aur calcium-rich anaaj ke liye Mandua–Til. Dono ek haath se kha sakti ho.', 'gond'],
+    ['Subscription kaise kaam karta hai?', 'Product page par "Subscribe & Save" chuno: har 2, 3 ya 4 hafte naya dabba, ' + SUB_OFF + '% kam mein. Kabhi bhi skip ya cancel.', ''],
+    ['Delivery kab tak aayegi?', 'Hum Dehradun se taaza bana kar bhejte hain. Asli delivery time launch par batayenge — abhi yeh prototype hai.', '']
+  ];
+  function chatMsg(who, html) { var b = $('#chatLog'); b.insertAdjacentHTML('beforeend', '<div class="msg ' + who + '">' + html + '</div>'); b.scrollTop = b.scrollHeight; }
+  function chatOpen() {
+    var c = $('#chat'); c.hidden = false;
+    if (!$('#chatLog').children.length) {
+      chatMsg('bot', 'Namaste beta! Main Nani hoon. 😊 Khane ke baare mein kuch bhi poochho.');
+      chatMsg('bot', '<span class="note">Main doctor nahi hoon — dawai ya bimari ke sawaal apne doctor se poochhna.</span>');
+    }
+    $('#chatIn').focus();
+  }
+  function chatAsk(i) {
+    var q = QA[i]; chatMsg('me', q[0]);
+    setTimeout(function () { chatMsg('bot', q[1] + (q[2] ? '<br><a href="#/p/' + q[2] + '">' + byId(q[2]).name + ' dekho →</a>' : '')); }, 450);
+  }
 
   /* ---------- router ---------- */
+  var slideTimer;
   function route() {
-    var parts = location.hash.replace(/^#\/?/, '').split('/');
-    var r = parts[0] || 'home';
+    var parts = location.hash.replace(/^#\/?/, '').split('/'), r = parts[0] || 'home';
     if (!pages[r]) r = 'home';
     $('#app').innerHTML = '<div class="page">' + pages[r](parts[1]) + '</div>';
-    var key = r === 'p' ? 'shop' : r;
-    document.querySelectorAll('.links a').forEach(function (a) { var on = a.dataset.r === key; a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    var key = r === 'p' ? 'shop/' + ((byId(parts[1]) || {}).cat || '') : (r === 'shop' && parts[1] ? 'shop/' + parts[1] : r);
+    document.querySelectorAll('.links a').forEach(function (a) { var on = a.dataset.r === key || (r === 'shop' && !parts[1] && a.dataset.r === 'shop'); a.classList.toggle('active', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     $('#links').classList.remove('open'); $('#burger').setAttribute('aria-expanded', 'false');
-    if (pages[r].after) pages[r].after();
+    if (pages[r].after) pages[r].after(parts[1]);
+    clearInterval(slideTimer); if (r === 'home') slideTimer = setInterval(function () { slide(-1); }, 6000);
     window.scrollTo(0, 0);
+  }
+  function slide(i) {
+    var s = document.querySelectorAll('.slide'); if (!s.length) return;
+    var cur = [].findIndex.call(s, function (x) { return x.classList.contains('on'); });
+    if (i < 0) i = (cur + 1) % s.length;
+    s.forEach(function (x, j) { x.classList.toggle('on', j === i); if (j === i) x.removeAttribute('aria-hidden'); else x.setAttribute('aria-hidden', 'true'); });
+    document.querySelectorAll('.dots2 button').forEach(function (b, j) { b.classList.toggle('on', j === i); });
   }
 
   /* ---------- events ---------- */
   document.addEventListener('click', function (e) {
-    if (e.target.id === 'cartModal') { $('#cartModal').hidden = true; return; }
-    var t = e.target.closest('[data-add],[data-addq],[data-buy],[data-q],[data-toast],[data-close],[data-inc],[data-dec],[data-checkout],#burger,#cartBtn');
+    if (e.target.id === 'cartModal') { closeCart(); return; }
+    var t = e.target.closest('[data-add],[data-addp],[data-buyp],[data-pack],[data-need],[data-slide],[data-pin],[data-toast],[data-close],[data-inc],[data-dec],[data-checkout],[data-qa],[data-chatx],#burger,#cartBtn,#chatBtn,#searchBtn');
     if (!t) return;
     var d = t.dataset;
     if (t.id === 'burger') { var o = $('#links').classList.toggle('open'); t.setAttribute('aria-expanded', o); return; }
     if (t.id === 'cartBtn') { openCart(); return; }
-    if (d.add) { add(d.add); return; }
-    if (d.q) { var q = $('#pq'); q.textContent = Math.max(1, Math.min(10, +q.textContent + +d.q)); return; }
-    if (d.addq) { add(d.addq, +$('#pq').textContent); return; }
-    if (d.buy) { add(d.buy, +$('#pq').textContent); openCart(); return; }
-    if (d.inc) { cart[d.inc]++; drawCart(); return; }
-    if (d.dec) { if (--cart[d.dec] <= 0) delete cart[d.dec]; drawCart(); return; }
-    if ('checkout' in d) { var g = gift; cart = {}; gift = false; drawCart(); $('#cartModal').hidden = true; toast('🙏 Shukriya!' + (g ? ' Chitthi dabbe ke saath jaayegi.' : '') + ' Yeh prototype hai — koi order ya payment nahi hua.'); return; }
-    if ('close' in d) { $('#cartModal').hidden = true; return; }
+    if (t.id === 'chatBtn') { var c = $('#chat'); if (c.hidden) chatOpen(); else c.hidden = true; return; }
+    if (t.id === 'searchBtn') { toast('🔍 Search jald aayega — abhi categories se dhoondho'); return; }
+    if ('chatx' in d) { $('#chat').hidden = true; return; }
+    if (d.qa) { chatAsk(+d.qa); return; }
+    if (d.add) { addItem(d.add, 0, false); return; }
+    if (d.addp || d.buyp) { var id = d.addp || d.buyp; addItem(id, pdp.pack, pdp.sub, pdp.sub ? $('#every').value : 0); if (d.buyp) openCart(); return; }
+    if (d.pack) { pdp.pack = +d.pack; document.querySelectorAll('#packs button').forEach(function (b) { b.setAttribute('aria-pressed', b === t); }); drawPrice(); return; }
+    if (d.need) { document.querySelectorAll('[data-need]').forEach(function (b) { b.setAttribute('aria-selected', b === t); }); $('#needGrid').innerHTML = needGrid(d.need); return; }
+    if (d.slide) { slide(+d.slide); clearInterval(slideTimer); return; }
+    if ('pin' in d) { var v = $('#pinIn').value.replace(/\D/g, ''); toast(v.length === 6 ? '📦 ' + v + ' — delivery ho jaayegi (prototype estimate: 3–5 din)' : '6 ank ka pincode daalo'); return; }
+    if (d.inc) { cart[+d.inc].q++; drawCart(); return; }
+    if (d.dec) { if (--cart[+d.dec].q <= 0) cart.splice(+d.dec, 1); drawCart(); return; }
+    if ('checkout' in d) { var g = gift, s = cart.some(function (x) { return x.sub; }); cart = []; gift = false; drawCart(); closeCart(); toast('🙏 Shukriya!' + (s ? ' Subscription shuru.' : '') + (g ? ' Chitthi dabbe ke saath jaayegi.' : '') + ' (Prototype — koi order ya payment nahi hua)'); return; }
+    if ('close' in d) { closeCart(); return; }
     if (d.toast) { e.preventDefault(); toast(d.toast); }
   });
-  document.addEventListener('change', function (e) { if (e.target.id === 'giftChk') { gift = e.target.checked; drawCart(); } });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('#cartModal').hidden = true; });
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'giftChk') { gift = e.target.checked; drawCart(); }
+    if (e.target.name === 'pt') { pdp.sub = e.target.value === 'sub'; drawPrice(); }
+    if (e.target.id === 'every') { if (!pdp.sub) { pdp.sub = true; $('input[name=pt][value=sub]').checked = true; } drawPrice(); }
+    if (e.target.id === 'sortSel') {
+      var g = $('#shopGrid'), cat = g.dataset.cat, list = cat ? P.filter(function (p) { return p.cat === cat; }) : P.slice(), v = e.target.value;
+      if (v === 'lo') list.sort(function (a, b) { return a.price - b.price; }); else if (v === 'hi') list.sort(function (a, b) { return b.price - a.price; }); else list.sort(function (a, b) { return (b.best ? 1 : 0) - (a.best ? 1 : 0); });
+      g.innerHTML = grid(list, 3);
+    }
+  });
+  document.addEventListener('submit', function (e) {
+    if (e.target.id === 'newsForm') { e.preventDefault(); toast($('#newsIn').value.trim() ? '💌 Judne ka shukriya! (Prototype — kuch save nahi hua)' : 'Email ya WhatsApp number daalo'); }
+    if (e.target.id === 'chatForm') {
+      e.preventDefault(); var v = $('#chatIn').value.trim(); if (!v) return; $('#chatIn').value = ''; chatMsg('me', v.replace(/</g, '&lt;'));
+      setTimeout(function () { chatMsg('bot', 'Achha sawaal! Asli Nani (humari team) jald WhatsApp par jawab degi. Abhi yeh prototype hai — neeche ke sawaal try karo.'); }, 450);
+    }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCart(); $('#chat').hidden = true; } });
+  window.addEventListener('scroll', function () { var s = $('#stickybuy'), b = $('#buyrow'); if (s && b) s.classList.toggle('show', b.getBoundingClientRect().bottom < 0); }, { passive: true });
   window.addEventListener('hashchange', route);
 
   $('#footHills').innerHTML = hills('transparent', '#E8D5BC', '#7D8450', '#3A2A1E');
+  $('#chatQuick').innerHTML = QA.map(function (q, i) { return '<button data-qa="' + i + '">' + q[0] + '</button>'; }).join('');
+  (function ribbon() { var r = $('#ribbonMsgs'); if (!r) return; var i = 0, m = r.children; setInterval(function () { m[i].classList.remove('on'); i = (i + 1) % m.length; m[i].classList.add('on'); }, 4000); })();
   drawCart(); route();
 })();

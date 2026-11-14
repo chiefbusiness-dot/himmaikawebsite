@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Himmaika — Delivery ke baad ke 40 din, jaise nani ke ghar mein</title>
-<meta name="description" content="Himmaika: Himalaya se, maike jaisa. Nayi maa ke pehle 40 din ka paramparik khana — pahadi anaaj aur Badri cow ghee se. Prototype preview.">
+<title>Himmaika — Nayi maa ka khana, jaise nani ke ghar mein</title>
+<meta name="description" content="Himmaika: Himalaya se, maike jaisa. Nayi maa ke liye taaza, saaf, pahadi ingredients se bane laddoo, panjiri, kheer aur soup. Har batch lab-tested. Prototype preview.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="aplus.css">
 </head>
 <body>
 <a class="skip" href="#app">Seedha content par jao</a>
 
-<div class="ribbon">🧪 Har batch ki lab report <span class="tag-pend">prototype</span> · 🏔️ Badri cow ghee se bana · Prototype preview</div>
+<div class="ribbon" id="ribbonMsgs"><span class="on">🔁 Subscribe &amp; Save 10% — har 2, 3 ya 4 hafte taaza dabba</span><span>🧪 Har batch lab-tested · QR se report dekho</span><span>🚚 ₹999 se upar free delivery · Prototype preview</span></div>
 
 <header class="nav">
   <div class="wrap nav-in">
@@ -23,15 +24,16 @@
     </a>
     <button class="burger" id="burger" aria-label="Menu kholo" aria-expanded="false" aria-controls="links"><span></span><span></span><span></span></button>
     <nav class="links" id="links" aria-label="Main">
-      <a href="#/shop" data-r="shop">Shop</a>
-      <a href="#/plan" data-r="plan">40-Day Plan</a>
-      <a href="#/gift" data-r="gift">Gift a 40</a>
+      <a href="#/shop" data-r="shop">Shop All</a>
+      <a href="#/shop/laddoo" data-r="shop/laddoo">Laddoo</a>
+      <a href="#/shop/meals" data-r="shop/meals">Meals &amp; Mixes</a>
+      <a href="#/shop/sips" data-r="shop/sips">Drinks &amp; Snacks</a>
+      <a href="#/shop/combo" data-r="shop/combo">Bundles</a>
       <a href="#/story" data-r="story">Our Story</a>
-      <a href="#/samajh" data-r="samajh">40 Din ki Samajh</a>
-      <a href="#/proof" data-r="proof">Our Proof</a>
-      <a href="#/nutritionist" data-r="nutritionist">Nutritionist</a>
+      <a href="#/proof" data-r="proof">Lab Reports</a>
       <a href="#/quiz" data-r="quiz" class="pill-sage">Meri Thali Banao</a>
     </nav>
+    <button class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
     <button class="cart-btn" id="cartBtn" aria-label="Thaila dekho">🧺 <span id="cartCount">0</span></button>
   </div>
 </header>
@@ -44,14 +46,14 @@
     <div class="wrap foot-grid">
       <div>
         <div class="logo logo-light"><span>Himmaika</span></div>
-        <p>हिम + मायका. Dehradun, Uttarakhand se — nayi maa ke pehle 40 din ka khana, pahadi anaaj aur Badri cow ghee ke saath. Barsana Magic parivaar ka hissa.</p>
+        <p>हिम + मायका. Dehradun, Uttarakhand se — nayi maa ke liye taaza, saaf, pahadi ingredients se bana khana. Har batch lab-tested. Barsana Magic parivaar ka hissa.</p>
       </div>
       <div>
         <h4>Shop</h4>
-        <a href="#/shop">Shop All</a><a href="#/shop/laddoo">Laddoo</a><a href="#/shop/meals">Meals &amp; Mixes</a><a href="#/shop/sips">Drinks &amp; Snacks</a><a href="#/shop/combo">Combos</a><a href="#/plan">40-Day Plan</a><a href="#/gift">Gift a 40</a><a href="#/nutritionist">Nutritionist</a><a href="#/quiz">Quiz</a><a href="#/story">Our Story</a><a href="#/samajh">40 Din ki Samajh</a><a href="#/proof">Our Proof</a>
+        <a href="#/shop">Shop All</a><a href="#/shop/laddoo">Laddoo</a><a href="#/shop/meals">Meals &amp; Mixes</a><a href="#/shop/sips">Drinks &amp; Snacks</a><a href="#/shop/combo">Bundles</a><a href="#/plan">40-Day Plan</a><a href="#/quiz">Meri Thali Banao</a>
       </div>
       <div>
-        <h4>Baat karo</h4>
+        <h4>Himmaika</h4><a href="#/story">Our Story</a><a href="#/samajh">40 Din ki Samajh</a><a href="#/proof">Lab Reports</a><a href="#/gift">Gift karo</a><a href="#/nutritionist">Nutritionist se baat</a></div><div><h4>Baat karo</h4>
         <a href="#" data-toast="WhatsApp Nani jald shuru hogi — abhi prototype hai 💛">💬 WhatsApp Nani</a>
         <a href="#" data-toast="Email jald aayega — prototype preview">namaste@himmaika.example</a>
         <span>Dehradun, Uttarakhand</span>
@@ -65,9 +67,15 @@
   </div>
 </footer>
 
-<button class="wa" data-toast="Nani abhi rasoi mein hai — WhatsApp jald shuru hoga 💛" aria-label="Nani se poochho (WhatsApp)">💬 <span>Nani se poochho</span></button>
+<button class="wa" id="chatBtn" aria-label="Nani se poochho" aria-controls="chat">💬 <span>Nani se poochho</span></button>
+<section class="chat" id="chat" aria-label="Nani se poochho chat" hidden>
+  <header><span class="ava">👵</span><div><strong>Nani</strong><small>Khane ke sawaalon ke liye · prototype</small></div><button class="x" data-chatx aria-label="Chat band karo">×</button></header>
+  <div class="log" id="chatLog" aria-live="polite"></div>
+  <div class="quick" id="chatQuick"></div>
+  <form id="chatForm"><input id="chatIn" type="text" placeholder="Nani se poochho..." autocomplete="off" aria-label="Apna sawaal"><button class="btn btn-p btn-sm">Bhejo</button></form>
+</section>
 
-<div class="modal" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
+<div class="modal drawer" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
   <div class="modal-card">
     <button class="x" data-close aria-label="Band karo">×</button>
     <h3 id="cartTitle">Aapka thaila</h3>
@@ -77,6 +85,7 @@
 
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
+<script src="icons.js"></script>
 <script src="info.js"></script>
 <script src="more.js"></script>
 <script src="app.js"></script>
