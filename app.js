@@ -141,7 +141,13 @@
       how: 'Order ke baad WhatsApp par call ka time tay hoga.',
       note: 'Khana main bhejungi, salah doctor-didi dengi. Tum bas aaram karo.' }
   ];
-  P.forEach(function (p) { if (!p.line) p.line = p.short; p.e = ''; });
+  var COMBO = { p10: ['kheer', 'khichdi', 'paani', 'doodh'], p40: ['gond', 'panjiri', 'kheer', 'makhana'], pn: ['gond', 'panjiri', 'mandua', 'doodh'] };
+  P.forEach(function (p) { if (!p.line) p.line = p.short; p.e = ''; if (!COMBO[p.id]) p.img = 'img/' + p.id + '.jpg'; });
+  function collage(ids, cls) { return '<span class="ph collage n' + ids.length + ' ' + (cls || '') + '">' + ids.map(function (id) { return '<img src="img/' + id + '.jpg" alt="" loading="lazy">'; }).join('') + '</span>'; }
+  function pic(p, cls) {
+    if (p.img) return '<img class="ph ' + (cls || '') + '" src="' + p.img + '" alt="' + p.name + ' (representative photo)" loading="lazy">';
+    return collage(COMBO[p.id], cls);
+  }
   var byId = function (id) { return P.filter(function (p) { return p.id === id; })[0]; };
   var PACKS = [{ n: 1, off: 0, l: '1 pack' }, { n: 2, off: 8, l: '2 packs' }, { n: 3, off: 12, l: '3 packs', tag: 'Best value' }];
   var SUB_OFF = 10, FREE_SHIP = 999;
@@ -170,7 +176,7 @@
     return '<ul class="feat">' + f.filter(function (x) { return x.indexOf('0%') < 0; }).map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
   }
   function card(p) {
-    return '<article class="pc lift"><a class="pc-img tone-' + p.cat + '" href="#/p/' + p.id + '" aria-label="' + p.name + '">' + art(p.art, 'big') +
+    return '<article class="pc lift"><a class="pc-img tone-' + p.cat + '" href="#/p/' + p.id + '" aria-label="' + p.name + '">' + pic(p) +
       '<span class="pc-badge">' + p.badge + '</span></a><div class="pc-body">' +
       '<h3><a href="#/p/' + p.id + '">' + p.name + '</a></h3><p class="pc-short">' + p.short + '</p>' + feats(p) +
       '<div class="pc-foot"><div class="price">' + rupee(p.price) + (p.mrp ? ' <s>' + rupee(p.mrp) + '</s>' : '') + '<small>' + p.unit + '</small></div>' +
@@ -200,11 +206,11 @@
     var body;
     if (s.hook) {
       body = '<div class="slide-copy"><span class="kicker">' + s.k + '</span><h1>' + s.h + '</h1><p>' + s.p + '</p><div class="row"><a class="btn btn-p" href="' + s.c[0] + '">' + s.c[1] + '</a><button class="btn btn-ghost-w" data-slide="1">Swipe karke samjho →</button></div></div>' +
-        '<div class="hook-stats">' + s.stats.map(function (x) { return '<div class="hs"><strong>' + x[0] + '</strong><span>' + x[1] + '</span><small>' + x[2] + '</small></div>'; }).join('') + '</div>';
+        '<div class="hook-right">' + collage(['gond', 'panjiri', 'kheer'], 'hook-col') + '<div class="hook-stats">' + s.stats.map(function (x) { return '<div class="hs"><strong>' + x[0] + '</strong><span>' + x[1] + '</span><small>' + x[2] + '</small></div>'; }).join('') + '</div></div>';
     } else {
       var p = byId(s.prod);
       body = '<div class="slide-copy"><span class="kicker">' + s.n + ' · ' + s.k + '</span><h2 class="h1">' + s.h + '</h2><p>' + s.p + '</p><span class="src">' + s.src + '</span></div>' +
-        '<a class="slide-prod" href="#/p/' + p.id + '"><span class="sp-art tone-' + p.cat + '">' + art(p.art, 'big') + '</span><span class="sp-k">Himmaika ka jawab</span><strong>' + p.name + '</strong><small>' + p.short + '</small><span class="sp-foot"><b>' + rupee(p.price) + '</b><span class="btn btn-p btn-sm">Dekho →</span></span></a>';
+        '<a class="slide-prod" href="#/p/' + p.id + '"><span class="sp-art tone-' + p.cat + '">' + pic(p) + '</span><span class="sp-k">Himmaika ka jawab</span><strong>' + p.name + '</strong><small>' + p.short + '</small><span class="sp-foot"><b>' + rupee(p.price) + '</b><span class="btn btn-p btn-sm">Dekho →</span></span></a>';
     }
     return '<div class="slide tone-' + s.tone + (s.hook ? ' hook' : '') + (i ? '' : ' on') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' of ' + SLIDES.length + '"' + (i ? ' aria-hidden="true"' : '') + '><div class="wrap slide-in">' + body + '</div></div>';
   }
@@ -218,9 +224,9 @@
 
       '<section class="brand"><div class="wrap"><div class="center"><span class="kicker">Himmaika kya hai</span><h2>Postpartum maa ke liye <em>khana. Bas yahi banate hain.</em></h2>' +
       '<p class="lede">Laddoo, panjiri, kheer, khichdi, soup aur garam ghoont — har cheez delivery ke baad ke dinon ke liye, nani ki jaape ki recipe se, saaf pahadi ingredients ke saath.</p></div>' +
-      '<div class="cats2">' + CATS.map(function (c) { var n = P.filter(function (p) { return p.cat === c.id; }).length; return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '">' + art(c.art, 'big') + '<strong>' + c.name + '</strong><small>' + c.line + '</small><span class="cnt">' + n + ' products →</span></a>'; }).join('') + '</div></div></section>' +
+      '<div class="cats2">' + CATS.map(function (c) { var n = P.filter(function (p) { return p.cat === c.id; }).length; var first = P.filter(function (p) { return p.cat === c.id; }); return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '"><span class="cat-ph">' + (c.id === 'combo' ? collage(['gond', 'panjiri', 'kheer', 'makhana']) : collage(first.slice(0, 2).map(function (x) { return x.id; }))) + '</span><strong>' + c.name + '</strong><small>' + c.line + '</small><span class="cnt">' + n + ' products →</span></a>'; }).join('') + '</div></div></section>' +
 
-      '<section class="story-band"><div class="wrap split"><div class="ab-art">' + art('mother', 'huge') + art('heart', 'a2') + '</div><div><span class="kicker">Humari kahani</span><h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
+      '<section class="story-band"><div class="wrap split"><div class="story-ph">' + collage(['gond', 'panjiri', 'doodh', 'kheer']) + '<span class="cap">Nani ki jaape ki rasoi — laddoo, panjiri, haldi doodh, kheer</span></div><div><span class="kicker">Humari kahani</span><h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
       '<p class="lede">Pehle jaapa maike mein hota tha. Nani 40 din rasoi sambhalti thi — gond ke laddoo, panjiri, ajwain ka paani — aur maa ka kaam sirf baby ko dekhna aur khana tha.</p><p class="lede">Aaj shehar mein na nani hai, na rasoi mein koi, na research ka time. Isliye humne nani ki rasoi ko dabbe mein band kiya: हिम + मायका — <strong>Himmaika</strong>.</p>' +
       '<a class="btn btn-g" href="#/story">Poori kahani</a></div></div></section>' +
 
@@ -234,7 +240,7 @@
       '<div id="needGrid">' + needGrid(NEEDS[0].id) + '</div></div></section>' +
 
       '<section><div class="wrap"><div class="center"><span class="kicker">Maa ki thali mein kya jaata hai</span><h2>Pahad ke anaaj, <em>jaape ki parampara</em></h2><p class="lede">Har ingredient jo hum postpartum maa ke khane mein daalte hain — aur kyun.</p></div>' +
-      '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet', 'mandua'], ['millet', 'Jhangora', 'High-fibre, pehle hafte ke liye', 'kheer'], ['seeds', 'Gahat', 'Pahadi protein daal', 'gahat'], ['nut', 'Makhana', 'Halka, raat ka snack', 'makhana'], ['seeds', 'Til', 'Calcium aur iron waala beej', 'mandua'], ['drop', 'Gond', 'Jaape ka sabse purana laddoo', 'gond']].map(function (x) { return '<a class="ing" href="#/p/' + x[3] + '">' + art(x[0], 'big') + '<strong>' + x[1] + '</strong><small>' + x[2] + '</small></a>'; }).join('') + '</div>' +
+      '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet', 'mandua'], ['millet', 'Jhangora', 'High-fibre, pehle hafte ke liye', 'kheer'], ['seeds', 'Gahat', 'Pahadi protein daal', 'gahat'], ['nut', 'Makhana', 'Halka, raat ka snack', 'makhana'], ['seeds', 'Til', 'Calcium aur iron waala beej', 'mandua'], ['drop', 'Gond', 'Jaape ka sabse purana laddoo', 'gond']].map(function (x) { return '<a class="ing" href="#/p/' + x[3] + '"><span class="ing-ph">' + pic(byId(x[3])) + '</span><strong>' + x[1] + '</strong><small>' + x[2] + '</small></a>'; }).join('') + '</div>' +
       '<p class="center note" style="margin-top:18px">Meetha sirf dates ya gud se · Ghee: organic Badri cow ghee · Poori list har pack par</p></div></section>' +
 
       '<section class="alt"><div class="wrap"><div class="center"><span class="kicker">Subscribe & Save</span><h2>Laddoo khatam hone se <em>pehle naya dabba</em></h2></div>' +
@@ -264,7 +270,7 @@
     var c = CATS.filter(function (x) { return x.id === cat; })[0];
     var list = c ? P.filter(function (p) { return p.cat === cat; }) : P;
     return '<section class="shop-hero tone-' + (c ? c.id : 'all') + '"><div class="wrap split"><div><nav class="crumb"><a href="#/">Home</a> / <span>' + (c ? c.name : 'Shop all') + '</span></nav>' +
-      '<h1>' + (c ? c.name : 'Nayi maa ki <em>poori rasoi</em>') + '</h1><p class="lede">' + (c ? c.line + '. ' : '') + (cat === 'combo' ? 'Bundles mein sabse zyada bachat — aur sochna nahi padta.' : 'Har cheez saaf, taaza ingredients se, ek haath se khane laayak. Meetha sirf dates ya gud se.') + '</p></div><div class="ab-art">' + art(c ? c.art : 'laddoo', 'huge') + '</div></div></section>' +
+      '<h1>' + (c ? c.name : 'Nayi maa ki <em>poori rasoi</em>') + '</h1><p class="lede">' + (c ? c.line + '. ' : '') + (cat === 'combo' ? 'Bundles mein sabse zyada bachat — aur sochna nahi padta.' : 'Har cheez saaf, taaza ingredients se, ek haath se khane laayak. Meetha sirf dates ya gud se.') + '</p></div><div class="shop-ph">' + collage(c && c.id === 'combo' ? ['gond', 'panjiri', 'kheer', 'makhana'] : (c ? P.filter(function (x) { return x.cat === cat; }) : P.filter(function (x) { return x.best; })).slice(0, 4).map(function (x) { return x.id; })) + '</div></div></section>' +
       '<section style="padding-top:28px"><div class="wrap"><div class="toolbar"><div class="filters">' + [{ id: '', name: 'Sab' }].concat(CATS).map(function (x) {
         return '<a href="#/shop' + (x.id ? '/' + x.id : '') + '"' + ((x.id || '') === (cat || '') ? ' class="on" aria-current="true"' : '') + '>' + x.name + '</a>';
       }).join('') + '</div><label class="sort">Sort <select id="sortSel"><option value="pop">Nani\'s picks pehle</option><option value="lo">Keemat: kam se zyada</option><option value="hi">Keemat: zyada se kam</option></select></label></div>' +
@@ -280,8 +286,8 @@
     var addons = P.filter(function (x) { return x.id !== p.id && x.cat !== 'combo'; }).sort(function (a, b) { return (b.best ? 1 : 0) - (a.best ? 1 : 0); }).slice(0, 3);
     var rel = P.filter(function (x) { return x.id !== p.id && x.cat === p.cat; }).concat(P.filter(function (x) { return x.best && x.cat !== p.cat; })).slice(0, 4);
     return '<section class="pdp"><div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="#/">Home</a> / <a href="#/shop/' + c.id + '">' + c.name + '</a> / <span>' + p.name + '</span></nav>' +
-      '<div class="pdp-grid"><div class="gal"><div class="main tone-' + p.cat + '">' + art(p.art, 'huge') + '<span class="pc-badge">' + p.badge + '</span><span class="photo-note">photo shoot ke baad asli tasveer</span></div>' +
-      '<div class="thumbs">' + [p.art, p.ing[0][0], 'hand', 'flask'].map(function (a, i) { return '<span class="tone-' + p.cat + (i ? '' : ' on') + '">' + art(a) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="pdp-grid"><div class="gal"><div class="main tone-' + p.cat + '">' + pic(p) + '<span class="pc-badge">' + p.badge + '</span><span class="photo-note">Representative photo · asli product shoot jald</span></div>' +
+      '<div class="thumbs">' + (COMBO[p.id] || [p.id].concat(P.filter(function (x) { return x.cat === p.cat && x.id !== p.id && x.img; }).slice(0, 3).map(function (x) { return x.id; }))).map(function (id, i) { return '<a href="#/p/' + id + '" class="tone-' + p.cat + (i ? '' : ' on') + '" aria-label="' + byId(id).name + '"><img src="img/' + id + '.jpg" alt="" loading="lazy"></a>'; }).join('') + '</div></div>' +
       '<div class="info"><h1>' + p.name + '</h1><p class="lede">' + p.short + '</p>' +
       '<div class="rating">' + art('heart') + ' Naya launch · reviews jald</div>' + feats(p) +
       '<div class="price big" id="pPrice"></div>' +
@@ -294,11 +300,11 @@
       '<div class="pin"><input id="pinIn" type="text" inputmode="numeric" maxlength="6" placeholder="Pincode daalo"><button class="btn btn-g btn-sm" data-pin>Delivery check</button></div>' +
       '<div class="offers"><strong>Offers</strong> <span class="tag-pend">prototype</span><ul><li>' + art('repeat') + 'Subscribe karo, har order par ' + SUB_OFF + '% off</li><li>' + art('truck') + rupee(FREE_SHIP) + ' se upar free delivery</li><li>' + art('gift') + 'Gift note muft — thaile mein tick karo</li></ul></div>' +
       '<div class="iconrow">' + [['flask', 'Lab-tested batch'], ['shield', 'Certified organic ghee'], ['seeds', 'No refined sugar'], ['hand', 'Ek haath se']].map(function (x) { return '<div>' + art(x[0]) + '<span>' + x[1] + '</span></div>'; }).join('') + '</div>' +
-      (combo ? '' : '<div class="addons"><strong>⭐ Zyadatar maayein saath mein lete hain</strong>' + addons.map(function (a) { return '<div class="ao"><span class="ao-art tone-' + a.cat + '">' + art(a.art) + '</span><a href="#/p/' + a.id + '">' + a.name + '<small>' + rupee(a.price) + '</small></a><button class="btn btn-g btn-sm" data-add="' + a.id + '">+ Add</button></div>'; }).join('') + '</div>') +
+      (combo ? '' : '<div class="addons"><strong>⭐ Zyadatar maayein saath mein lete hain</strong>' + addons.map(function (a) { return '<div class="ao"><span class="ao-art tone-' + a.cat + '">' + pic(a) + '</span><a href="#/p/' + a.id + '">' + a.name + '<small>' + rupee(a.price) + '</small></a><button class="btn btn-g btn-sm" data-add="' + a.id + '">+ Add</button></div>'; }).join('') + '</div>') +
       '</div></div></div></section>' +
 
       /* A+ content */
-      '<section class="aplus1 tone-' + p.cat + '"><div class="wrap split"><div><span class="kicker">Aapka yeh pal</span><p class="pain big">"' + p.moment + '"</p><h2>' + p.name + ' — <em>isi pal ke liye bana</em></h2><p class="lede">' + p.short + '</p></div><div class="ab-art">' + art(p.art, 'huge') + art('mother', 'a2') + '</div></div></section>' +
+      '<section class="aplus1 tone-' + p.cat + '"><div class="wrap split"><div><span class="kicker">Aapka yeh pal</span><p class="pain big">"' + p.moment + '"</p><h2>' + p.name + ' — <em>isi pal ke liye bana</em></h2><p class="lede">' + p.short + '</p></div><div class="aplus-ph">' + pic(p) + '</div></div></section>' +
       '<section><div class="wrap"><div class="center"><span class="kicker">Kya milega</span><h2>' + (combo ? 'Is dabbe mein <em>kya khaas hai</em>' : 'Kyun khaayein <em>' + p.name + '</em>') + '</h2></div>' +
       '<div class="bens">' + p.ben.map(function (b) { return '<div class="ben">' + art(b[0], 'big') + '<h3>' + b[1] + '</h3><p>' + b[2] + '</p></div>'; }).join('') + '</div>' +
       '<p class="note center">Yeh ingredients aur aam poshan ki jaankari hai, koi ilaaj ka daava nahi. Numbers: ICMR-NIN 2020, NFHS-5. <a href="#/samajh">Poori samajh</a></p></div></section>' +
@@ -341,6 +347,14 @@
       '<section><div class="wrap center"><p class="quote">"Har nayi maa ko uske 40 din ka haq mile, chahe ghar mein koi bada ho ya na ho."<span>Humara mission</span></p></div></section>' + endCta;
   };
 
+  pages.credits = function () {
+    return '<section><div class="wrap narrow"><span class="kicker">Photo credits</span><h1>Tasveeron ka <em>shukriya</em></h1><p class="lede">Is prototype ki saari food photos representative hain — Wikimedia Commons se, unke free licence ke saath. Asli Himmaika product photo shoot ke baad yeh badal di jaayengi.</p><ul class="sources" id="creditList"><li>Load ho raha hai…</li></ul></div></section>';
+  };
+  pages.credits.after = function () {
+    fetch('img/credits.json').then(function (r) { return r.json(); }).then(function (c) {
+      $('#creditList').innerHTML = c.map(function (x) { return '<li><strong>' + byId(x.id).name + ':</strong> <a href="' + x.page + '" target="_blank" rel="noopener">' + x.title.replace('File:', '') + '</a> — ' + x.artist + ' · ' + x.license + '</li>'; }).join('');
+    }).catch(function () { $('#creditList').innerHTML = '<li>Credits file nahi mili.</li>'; });
+  };
   window.HM_INFO(pages, src, endCta);
   window.HM_MORE(pages, { $: $, rupee: rupee, toast: toast, byId: byId, endCta: endCta });
 
@@ -358,7 +372,7 @@
     if (!cart.length) { body.innerHTML = '<div class="empty">' + art('laddoo', 'big') + '<p>Thaila khaali hai. Nani kehti: "Pehle ek laddoo toh rakh lo."</p><a class="btn btn-p" href="#/shop" data-close>Shop dekho</a></div>'; return; }
     var left = FREE_SHIP - tot, note = gift && $('#giftNote') ? $('#giftNote').value : '';
     body.innerHTML = '<div class="ship"><p>' + (left > 0 ? rupee(left) + ' aur, phir delivery free' : '🎉 Free delivery mil gayi') + '</p><div class="bar"><i style="width:' + Math.min(100, tot / FREE_SHIP * 100) + '%"></i></div></div>' +
-      cart.map(function (x, i) { var p = byId(x.id); return '<div class="ci"><span class="ci-art tone-' + p.cat + '">' + art(p.art) + '</span><div class="n">' + p.name + '<small>' + (p.cat === 'combo' ? p.unit : PACKS[x.pack].l) + (x.sub ? ' · har ' + x.every + ' hafte · ' + SUB_OFF + '% off' : '') + '</small><small>' + rupee(unitPrice(p, x.pack, x.sub)) + '</small></div><div class="qty"><button data-dec="' + i + '" aria-label="Kam karo">−</button><b>' + x.q + '</b><button data-inc="' + i + '" aria-label="Badhao">+</button></div></div>'; }).join('') +
+      cart.map(function (x, i) { var p = byId(x.id); return '<div class="ci"><span class="ci-art tone-' + p.cat + '">' + pic(p) + '</span><div class="n">' + p.name + '<small>' + (p.cat === 'combo' ? p.unit : PACKS[x.pack].l) + (x.sub ? ' · har ' + x.every + ' hafte · ' + SUB_OFF + '% off' : '') + '</small><small>' + rupee(unitPrice(p, x.pack, x.sub)) + '</small></div><div class="qty"><button data-dec="' + i + '" aria-label="Kam karo">−</button><b>' + x.q + '</b><button data-inc="' + i + '" aria-label="Badhao">+</button></div></div>'; }).join('') +
       '<label class="toggle" style="margin-top:14px"><input type="checkbox" id="giftChk"' + (gift ? ' checked' : '') + '><span>🎁 Yeh gift hai — chitthi saath bhejo</span></label>' +
       (gift ? '<textarea id="giftNote" style="margin-top:10px" placeholder="Beta, main aa nahi payi, par yeh laddoo meri taraf se roz ek khana..."></textarea>' : '') +
       '<div class="tot"><span>Kul</span><span>' + rupee(tot) + '</span></div><button class="btn btn-p" style="width:100%" data-checkout>Checkout karo</button><p class="note" style="margin-top:10px">Prototype: koi asli payment nahi hoga.</p>';

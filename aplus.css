@@ -257,3 +257,38 @@ a.ing:hover .art{border-color:var(--terra)}
 .hero2{padding:0}
 .btn-ghost-w{background:transparent}
 @media(max-width:640px){.ribbon span{font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:32px;text-align:center}}
+/* ---------- photos ---------- */
+img.ph{width:100%;height:100%;object-fit:cover;display:block}
+.collage{display:grid;width:100%;height:100%;gap:3px;background:var(--sand)}
+.collage img{width:100%;height:100%;object-fit:cover;display:block;min-height:0}
+.collage.n2{grid-template-columns:1fr 1fr}
+.collage.n3{grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr}.collage.n3 img:first-child{grid-row:span 2}
+.collage.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.pc-img{overflow:hidden;padding:0}
+.pc-img img,.pc-img .collage{transition:transform .4s}
+.pc:hover .pc-img img{transform:scale(1.04)}
+.cat2{padding:0 0 18px;overflow:hidden}
+.cat-ph{display:block;width:100%;aspect-ratio:16/10;margin-bottom:10px}
+.cat2 strong,.cat2 small,.cat2 .cnt{padding:0 14px}
+.hook-right{display:grid;gap:12px}
+.hook-col{aspect-ratio:16/10;border-radius:20px;overflow:hidden;border:1px solid rgba(232,213,188,.25)}
+.sp-art{overflow:hidden;padding:0}
+.story-ph{position:relative;aspect-ratio:4/3;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.story-ph .cap{position:absolute;left:12px;bottom:12px;right:12px;background:rgba(58,42,30,.78);color:#fff;font-size:.78rem;font-weight:700;border-radius:12px;padding:8px 12px}
+.ing-ph{display:block;width:110px;height:110px;border-radius:50%;overflow:hidden;border:3px solid #fff;box-shadow:var(--shadow-s);margin-bottom:6px}
+.gal .main{overflow:hidden;padding:0}
+.gal .main .photo-note{background:rgba(255,255,255,.85);padding:3px 8px;border-radius:99px;opacity:1}
+.thumbs a{aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:1px solid var(--sand);display:block}
+.thumbs a img{width:100%;height:100%;object-fit:cover}
+.thumbs a.on{outline:2px solid var(--terra)}
+@media(max-width:899px){.thumbs{display:grid}}
+.aplus-ph{aspect-ratio:4/3;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.ao-art,.ci-art{overflow:hidden;padding:0}
+.shop-ph{aspect-ratio:16/10;border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+.shop-hero .split{align-items:center}
+.collage{overflow:hidden}
+.collage.n3,.collage.n4{grid-template-rows:repeat(2,minmax(0,1fr))}
+.collage.n2{grid-template-rows:minmax(0,1fr)}
+.cat-ph,.hook-col,.story-ph,.shop-ph,.aplus-ph,.sp-art,.pc-img,.gal .main{overflow:hidden}
+.cat-ph>.collage,.pc-img>.collage,.sp-art>.collage{position:relative;height:100%}
+.pc-img{display:block}
