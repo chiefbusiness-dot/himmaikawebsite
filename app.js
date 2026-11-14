@@ -191,9 +191,9 @@
   /* ---------- pages ---------- */
   var pages = {};
   var SLIDES = [
-    { tone: 'terra', k: 'Nani ke laddoo, ab aapke shehar mein', h: 'Delivery ke baad ka khana, <em>jaise nani ke ghar mein</em>', p: 'Taaza, saaf, pahadi ingredients se bane laddoo, panjiri, kheer aur soup — ek haath se khane laayak.', c: ['#/shop', 'Abhi shop karo'], c2: ['#/quiz', '2-minute quiz'], arts: ['laddoo', 'mother', 'millet'] },
-    { tone: 'sage', k: 'Subscribe & Save', h: 'Har 2 hafte taaza dabba, <em>' + SUB_OFF + '% kam mein</em>', p: 'Laddoo khatam hone se pehle naya dabba. Kabhi bhi skip, roko ya cancel karo.', c: ['#/p/gond', 'Gond Laddoo subscribe karo'], arts: ['repeat', 'jar', 'truck'] },
-    { tone: 'ink', k: 'Bundles', h: 'Pehle 10 din se <em>poore 40 din tak</em>', p: 'Sochna nahi padega — din-ba-din card ke saath poora dabba.', c: ['#/shop/combo', 'Bundles dekho'], arts: ['gift', 'calendar', 'bowl'] }
+    { tone: 'terra', k: 'Nayi maa ke liye · delivery ke baad ke pehle 40 din', h: 'Delivery ho gayi. Nani door hain. <em>Ab khana kaun banayega?</em>', p: 'Baby ko sambhalte-sambhalte maa khud khaana bhool jaati hai. Himmaika nayi maa ke liye nani jaisa jaape ka khana bhejta hai — laddoo, panjiri, kheer, soup. Taaza, saaf, ek haath se khane laayak.', c: ['#/shop', 'Maa ke liye shop karo'], c2: ['#/quiz', 'Kya khaun? 2-min quiz'], arts: ['mother', 'laddoo', 'bowl'] },
+    { tone: 'sage', k: 'Humari kahani', h: 'Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em>', p: 'Pehle nani 40 din maa ki rasoi sambhalti thi. Aaj shehar mein na nani hai, na time. Isliye humne nani ki rasoi ko dabbe mein band kiya.', c: ['#/story', 'Humari kahani padho'], c2: ['#/samajh', 'Yeh khana kyun?'], arts: ['heart', 'mountain', 'pot'] },
+    { tone: 'ink', k: 'Pati, maa, behen — door se bhi', h: 'Aap wahan nahi ho sakte? <em>Aapka khana pahunch sakta hai.</em>', p: 'Bengaluru mein beti, Dehradun mein maa? Pehle 10 din ya poore 40 din ka dabba, aapki chitthi ke saath.', c: ['#/shop/combo', 'Bundles dekho'], c2: ['#/gift', 'Gift karo'], arts: ['gift', 'calendar', 'truck'] }
   ];
   pages.home = function () {
     return '<section class="hero2"><div class="slides">' + SLIDES.map(function (s, i) {
@@ -205,6 +205,13 @@
       '<div class="usp"><div class="wrap usp-in">' +
       [['shield', 'Certified organic ghee', 'pending'], ['flask', 'Har batch lab-tested', ''], ['seeds', 'No refined sugar', ''], ['hand', 'Ek haath se khane laayak', ''], ['leaf', 'Taaza, chhote batch', '']].map(function (u) { return '<div class="u">' + art(u[0]) + '<span>' + u[1] + (u[2] ? ' <span class="tag-pend">' + u[2] + '</span>' : '') + '</span></div>'; }).join('') + '</div></div>' +
 
+      '<section class="forwho"><div class="wrap"><div class="center"><span class="kicker">Yeh kiske liye hai</span><h2>Nayi maa ke liye. <em>Aur unke liye jo uski fikr karte hain.</em></h2></div><div class="fw">' +
+      [['mother', 'Nayi maa', 'Delivery haal hi mein hui hai ya hone waali hai. Baby ko sambhalna hai, khud ko bhi.', '#/shop', 'Apne liye shop karo'], ['heart', 'Pati aur parivaar', 'Madad karna chahte ho, par pata nahi kya banana hai. Dabba kholo, bas.', '#/shop/combo', 'Bundles dekho'], ['gift', 'Door baithi maa, behen, dost', 'Aap wahan nahi ja sakte. Aapka khana aur chitthi ja sakti hai.', '#/gift', 'Gift karo']].map(function (f) { return '<a class="fwc lift" href="' + f[3] + '">' + art(f[0], 'big') + '<h3>' + f[1] + '</h3><p>' + f[2] + '</p><span>' + f[4] + ' →</span></a>'; }).join('') + '</div></div></section>' +
+
+      '<section class="problem"><div class="wrap"><div class="center"><span class="kicker">Asli mushkil</span><h2>Delivery ke baad ke din <em>koi nahi batata</em></h2><p class="lede">Sab badhaai dete hain, baby ki photo maangte hain. Par maa ke saath jo ho raha hai, uski baat koi nahi karta.</p></div>' +
+      '<div class="probs">' + [['moon', 'Raat ke 3 baje bhookh', 'Feeding ke baad pet khaali, aur rasoi mein koi nahi.'], ['sun', 'Thakaan jo jaati nahi', 'Delivery, khoon ki kami, aur raaton ki neend gayi.'], ['leaf', 'Pet saaf nahi hota', 'Dawaiyaan, iron ki goliyan, taankon ka darr — sabse aam, sabse chhupi takleef.'], ['chat', '"Kya khaun, kab khaun?"', 'Google par 50 jawab, bharosa kisi par nahi, research ka time bilkul nahi.'], ['mountain', 'Nani hazaar kilometre door', 'Pehle jaapa maike mein hota tha. Ab shehar mein, akele.']].map(function (x) { return '<div class="prob">' + art(x[0], 'big') + '<h3>' + x[1] + '</h3><p>' + x[2] + '</p></div>'; }).join('') + '</div>' +
+      '<div class="answer"><p><strong>Himmaika ka jawab:</strong> nani ki jaape ki rasoi — taaza, saaf ingredients se, har batch lab-tested, ek haath se khane laayak. Aap bas baby ko sambhalo.</p><a class="btn btn-p" href="#/shop">Dekho kya hai</a></div></div></section>' +
+
       '<section><div class="wrap">' + head('Shop by category', 'Aaj kya chahiye?') +
       '<div class="cats2">' + CATS.map(function (c) { return '<a class="cat2 lift tone-' + c.id + '" href="#/shop/' + c.id + '">' + art(c.art, 'big') + '<strong>' + c.name + '</strong><small>' + c.line + '</small></a>'; }).join('') + '</div></div></section>' +
 
@@ -213,10 +220,6 @@
       '<section><div class="wrap">' + head('Shop by need', 'Aapko abhi <em>kis cheez ki zaroorat hai?</em>', '', '', 'Har maa ka din alag hai. Apni zaroorat chuno.') +
       '<div class="needs" role="tablist">' + NEEDS.map(function (n, i) { return '<button role="tab" data-need="' + n.id + '" aria-selected="' + !i + '">' + art(n.art) + n.name + '</button>'; }).join('') + '</div>' +
       '<div id="needGrid">' + needGrid(NEEDS[0].id) + '</div></div></section>' +
-
-      '<section class="aplus-band"><div class="wrap split"><div class="ab-art">' + art('mother', 'huge') + '</div><div><span class="kicker">Sach baat</span><h2>Sab baby ka poochhte hain. <em>Maa ka koi nahi poochhta.</em></h2>' +
-      '<p class="lede">"Baby ne doodh piya? Baby soya?" — aur aapne subah se kya khaya, yeh kisi ne nahi poochha. Shehar mein nani nahi hai, rasoi mein koi nahi, aur research karne ka time bilkul nahi. Isliye Himmaika: nani ki rasoi, saaf aur taaza, seedha aapke darwaze par.</p>' +
-      '<a class="btn btn-g" href="#/story">Humari kahani</a></div></div></section>' +
 
       '<section><div class="wrap"><div class="center"><span class="kicker">Andar kya hai</span><h2>Saaf. Taaza. <em>Pahadi.</em></h2><p class="lede">Hum label par wahi likhte hain jo dabbe mein hai. Pahad ke anaaj, asli nuts aur beej, dates ya gud ka meetha.</p></div>' +
       '<div class="ingr">' + [['millet', 'Mandua', 'Calcium-rich finger millet'], ['millet', 'Jhangora', 'High-fibre barnyard millet'], ['seeds', 'Gahat', 'Pahadi protein daal'], ['nut', 'Makhana', 'Halka, crunchy'], ['seeds', 'Til', 'Calcium aur iron waala beej'], ['drop', 'Gond', 'Jaape ki parampara']].map(function (x) { return '<div class="ing">' + art(x[0], 'big') + '<strong>' + x[1] + '</strong><small>' + x[2] + '</small></div>'; }).join('') + '</div>' +

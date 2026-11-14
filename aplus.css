@@ -205,3 +205,18 @@ body:has(.stickybuy.show) .wa{bottom:78px}
 #chatForm input{min-height:42px;border-radius:99px}
 @media(min-width:1080px){.links a{white-space:nowrap;font-size:.84rem;padding:8px 8px}.logo{font-size:1.3rem}}
 @media(min-width:1080px) and (max-width:1240px){.links a.pill-sage{padding:9px 12px}.icon-btn{display:none}}
+/* audience + problem */
+.fw{display:grid;gap:16px;margin-top:26px}@media(min-width:860px){.fw{grid-template-columns:repeat(3,1fr)}}
+.fwc{background:#fff;border:1px solid var(--sand);border-radius:22px;padding:24px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px}
+.fwc .art.big{width:60px;height:60px;background:var(--cream-w);border-radius:50%;padding:12px}
+.fwc p{color:var(--ink-soft);font-size:.94rem;margin:0}
+.fwc span{margin-top:auto;padding-top:8px;font-weight:800;color:var(--terra-d);font-size:.9rem}
+.problem{background:var(--ink);color:var(--cream-w)}
+.problem h2,.problem h3{color:var(--cream)}.problem em{color:#E8A27F}.problem .lede{color:rgba(250,243,232,.8)}.problem .kicker{color:var(--mustard)}
+.probs{display:grid;gap:14px;margin-top:28px}@media(min-width:640px){.probs{grid-template-columns:repeat(2,1fr)}}@media(min-width:1000px){.probs{grid-template-columns:repeat(5,1fr)}}
+.prob{background:rgba(250,243,232,.06);border:1px solid rgba(232,213,188,.18);border-radius:20px;padding:20px}
+.prob .art.big{width:48px;height:48px;color:var(--mustard)}
+.prob h3{font-size:1.05rem;margin-top:10px}.prob p{font-size:.88rem;opacity:.8;margin:0}
+.answer{margin-top:26px;background:var(--cream);color:var(--ink);border-radius:20px;padding:20px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.answer p{margin:0;max-width:70ch}
+.slide p{max-width:54ch}
