@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="hi-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Himmaika — Delivery ke baad ke 40 din, jaise nani ke ghar mein</title>
+<meta name="description" content="Himmaika: Himalaya se, maike jaisa. Nayi maa ke pehle 40 din ka paramparik khana — pahadi anaaj aur Badri cow ghee se. Prototype preview.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#app">Seedha content par jao</a>
+
+<div class="ribbon">🧪 Har batch ki lab report <span class="tag-pend">prototype</span> · 🏔️ Badri cow ghee se bana · Prototype preview</div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#/" aria-label="Himmaika home">
+      <svg viewBox="0 0 44 32" width="44" height="32" aria-hidden="true"><path d="M2 30 L15 8 L21 17 L27 4 L42 30 Z" fill="#B85C38"/><path d="M27 4 L31 11 L28 10 L26 13 L24 9 Z" fill="#FAF3E8"/><path d="M15 8 L18 13 L15.500 12 L13.500 14 L12.500 12.300 Z" fill="#FAF3E8"/><path d="M2 30 Q22 22 42 30 Z" fill="#7D8450"/></svg>
+      <span>Himmaika</span>
+    </a>
+    <button class="burger" id="burger" aria-label="Menu kholo" aria-expanded="false" aria-controls="links"><span></span><span></span><span></span></button>
+    <nav class="links" id="links" aria-label="Main">
+      <a href="#/shop" data-r="shop">Shop</a>
+      <a href="#/plan" data-r="plan">40-Day Plan</a>
+      <a href="#/gift" data-r="gift">Gift a 40</a>
+      <a href="#/story" data-r="story">Our Story</a>
+      <a href="#/samajh" data-r="samajh">40 Din ki Samajh</a>
+      <a href="#/proof" data-r="proof">Our Proof</a>
+      <a href="#/nutritionist" data-r="nutritionist">Nutritionist</a>
+      <a href="#/quiz" data-r="quiz" class="pill-sage">Meri Thali Banao</a>
+    </nav>
+    <button class="cart-btn" id="cartBtn" aria-label="Thaila dekho">🧺 <span id="cartCount">0</span></button>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="foot">
+  <div class="hills-wrap" aria-hidden="true" id="footHills"></div>
+  <div class="foot-body">
+    <div class="wrap foot-grid">
+      <div>
+        <div class="logo logo-light"><span>Himmaika</span></div>
+        <p>हिम + मायका. Dehradun, Uttarakhand se — nayi maa ke pehle 40 din ka khana, pahadi anaaj aur Badri cow ghee ke saath. Barsana Magic parivaar ka hissa.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <a href="#/shop">Shop All</a><a href="#/shop/laddoo">Laddoo</a><a href="#/shop/meals">Meals &amp; Mixes</a><a href="#/shop/sips">Drinks &amp; Snacks</a><a href="#/shop/combo">Combos</a><a href="#/plan">40-Day Plan</a><a href="#/gift">Gift a 40</a><a href="#/nutritionist">Nutritionist</a><a href="#/quiz">Quiz</a><a href="#/story">Our Story</a><a href="#/samajh">40 Din ki Samajh</a><a href="#/proof">Our Proof</a>
+      </div>
+      <div>
+        <h4>Baat karo</h4>
+        <a href="#" data-toast="WhatsApp Nani jald shuru hogi — abhi prototype hai 💛">💬 WhatsApp Nani</a>
+        <a href="#" data-toast="Email jald aayega — prototype preview">namaste@himmaika.example</a>
+        <span>Dehradun, Uttarakhand</span>
+      </div>
+    </div>
+    <div class="wrap fine">
+      <p><strong>Zaroori baat:</strong> Himmaika ka khana paramparik bhojan hai, dawai nahi. Yeh kisi bimari ka ilaaj, bachaav ya nidaan nahi karta. Delivery ke baad apne khaan-paan ke baare mein apne doctor se zaroor poochhein, khaas kar C-section, diabetes, BP ya allergy mein. Products mein nuts, til aur doodh se bani cheezein hain — yeh allergens hain.</p>
+      <p><strong>Prototype preview:</strong> yeh website ek design prototype hai. Keemat, products, certifications, lab reports aur claims final nahi hain; cart, booking aur payment asli nahi hain. "Pending" ya "illustrative" likhi har cheez abhi confirm honi baaki hai.</p>
+      <p>© 2026 Himmaika · Dehradun</p>
+    </div>
+  </div>
+</footer>
+
+<button class="wa" data-toast="Nani abhi rasoi mein hai — WhatsApp jald shuru hoga 💛" aria-label="Nani se poochho (WhatsApp)">💬 <span>Nani se poochho</span></button>
+
+<div class="modal" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
+  <div class="modal-card">
+    <button class="x" data-close aria-label="Band karo">×</button>
+    <h3 id="cartTitle">Aapka thaila</h3>
+    <div id="cartBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script src="info.js"></script>
+<script src="more.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

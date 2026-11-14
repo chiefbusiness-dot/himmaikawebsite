@@ -1,0 +1,12 @@
+# Render blueprint: one free static site. No build step, no database.
+services:
+  - type: web
+    name: himmaika
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    autoDeploy: true
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex
