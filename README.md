@@ -13,3 +13,5 @@ Preview locally: `node serve.cjs`, then open http://localhost:4173
 
 Deploy: Render reads `render.yaml` and publishes this folder as a static site.
 Search engines are told not to index it while it is a prototype.
+
+Live: https://himmaika.onrender.com (auto-deploys from `main`)
